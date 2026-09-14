@@ -89,7 +89,10 @@ Dann lässt das Skript die Datei unangetastet, und das Build command kann leer b
 | `SEND_CONFIRMATION` | Text | optional | `false` schaltet die automatische Eingangsbestätigung an Anfragende ab. |
 | `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | Text / Secret | optional | Zusätzlicher Spamschutz, siehe unten. |
 
-Nach dem Setzen von Secrets einmal **neu deployen**, damit sie greifen.
+> ⚠️ **Secrets greifen erst nach einem neuen Deployment.** Die laufende Version des Workers
+> kennt nur die Secrets, die es zum Zeitpunkt ihres Deployments gab. Nach dem Anlegen also einen
+> neuen Build anstoßen (Dashboard → **Deployments** → neuesten Build erneut ausführen) oder einen
+> beliebigen Commit pushen – der Git-Build deployt automatisch.
 
 ### 2.4 Eigene Domain
 

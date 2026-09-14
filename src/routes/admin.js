@@ -20,7 +20,9 @@ async function login(request, env) {
     return jsonResponse(
       {
         error:
-          'Der Admin-Bereich ist noch nicht eingerichtet. Bitte das Secret ADMIN_PASSWORD im Cloudflare-Dashboard setzen.',
+          'Der Admin-Bereich ist noch nicht eingerichtet. Bitte im Cloudflare-Dashboard unter ' +
+          'Settings → Variables and Secrets das Secret ADMIN_PASSWORD setzen. Ist es dort schon ' +
+          'gesetzt, läuft noch eine ältere Version: einmal neu deployen, dann greift es.',
       },
       { status: 503 }
     );
