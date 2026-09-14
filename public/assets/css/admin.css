@@ -476,3 +476,49 @@ body.admin .btn {
   background: var(--chip);
   color: #2f4a2c;
 }
+
+/* Aufklappbare Hilfe im Anmeldefenster */
+.hilfe {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 2px;
+}
+.hilfe summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  list-style: none;
+}
+.hilfe summary::-webkit-details-marker {
+  display: none;
+}
+.hilfe summary::before {
+  content: '▸ ';
+  color: var(--soft);
+}
+.hilfe[open] summary::before {
+  content: '▾ ';
+}
+.hilfe summary:hover {
+  color: var(--ink);
+}
+.hilfe p,
+.hilfe li {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.hilfe p {
+  margin-top: 10px;
+}
+.hilfe ol {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.hilfe ol li {
+  list-style: decimal;
+}

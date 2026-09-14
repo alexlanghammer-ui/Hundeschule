@@ -38,26 +38,39 @@
   }
 
   /* --------------------------------------------------------------- Anmeldung */
+  /**
+   * Sichtbarkeit nicht allein dem hidden-Attribut ueberlassen: Liefert ein
+   * Browser eine aeltere, zwischengespeicherte CSS-Datei aus, kann ein
+   * display-Wert das Attribut ueberstimmen – dann staenden beide Formulare
+   * gleichzeitig da. Der inline gesetzte Stil gilt in jedem Fall.
+   */
+  function setzeSichtbar(id, sichtbar) {
+    var node = el(id);
+    if (!node) return;
+    node.hidden = !sichtbar;
+    node.style.display = sichtbar ? '' : 'none';
+  }
+
   function zeigeLogin(fehler) {
-    el('appView').hidden = true;
-    el('loginView').hidden = false;
-    el('setupForm').hidden = true;
-    el('loginForm').hidden = false;
+    setzeSichtbar('appView', false);
+    setzeSichtbar('loginView', true);
+    setzeSichtbar('setupForm', false);
+    setzeSichtbar('loginForm', true);
     var box = el('loginError');
     box.textContent = fehler || '';
-    box.hidden = !fehler;
+    setzeSichtbar('loginError', Boolean(fehler));
     el('password').focus();
   }
 
   /** Erstes Mal: Passwort selbst vergeben. */
   function zeigeEinrichtung(fehler) {
-    el('appView').hidden = true;
-    el('loginView').hidden = false;
-    el('loginForm').hidden = true;
-    el('setupForm').hidden = false;
+    setzeSichtbar('appView', false);
+    setzeSichtbar('loginView', true);
+    setzeSichtbar('loginForm', false);
+    setzeSichtbar('setupForm', true);
     var box = el('setupError');
     box.textContent = fehler || '';
-    box.hidden = !fehler;
+    setzeSichtbar('setupError', Boolean(fehler));
     el('setupPassword').focus();
   }
 
@@ -75,7 +88,7 @@
       .then(function () {
         el('setupPassword').value = '';
         el('setupRepeat').value = '';
-        el('setupError').hidden = true;
+        setzeSichtbar('setupError', false);
         start();
       })
       .catch(function (err) { zeigeEinrichtung(err.message); })
@@ -92,7 +105,7 @@
     })
       .then(function () {
         el('password').value = '';
-        el('loginError').hidden = true;
+        setzeSichtbar('loginError', false);
         start();
       })
       .catch(function (err) { zeigeLogin(err.message); })
@@ -573,8 +586,8 @@
 
         return api('/api/admin/content').then(function (data) {
           state.content = data.content;
-          el('loginView').hidden = true;
-          el('appView').hidden = false;
+          setzeSichtbar('loginView', false);
+          setzeSichtbar('appView', true);
           baueKontakt();
           bauePreise();
           baueKurse();

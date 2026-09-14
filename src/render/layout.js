@@ -4,6 +4,12 @@
 
 import { html, raw, esc, telHref } from '../lib/html.js';
 
+/**
+ * Wird an Stylesheet und Skript angehängt. Bei jeder Änderung an site.css oder
+ * site.js hochzählen – sonst liefern Browser tagelang die alte Datei aus.
+ */
+export const ASSET_VERSION = '2';
+
 export const NAV = [
   { href: '/', label: 'Start' },
   { href: '/einzeltraining', label: 'Einzeltraining' },
@@ -232,7 +238,7 @@ ${noindex ? '<meta name="robots" content="noindex, nofollow">' : ''}
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/instrument-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="stylesheet" href="/assets/css/site.css?v=${ASSET_VERSION}">
 <script type="application/ld+json">${jsonLd(content, siteUrl)}</script>
 </head>
 <body class="has-action-bar">
@@ -244,7 +250,7 @@ ${typeof body === 'string' ? body : body.value}
 ${footer(content).value}
 ${actionBar(content).value}
 ${cookieBanner().value}
-<script src="/assets/js/site.js" defer></script>
+<script src="/assets/js/site.js?v=${ASSET_VERSION}" defer></script>
 </body>
 </html>`;
 }

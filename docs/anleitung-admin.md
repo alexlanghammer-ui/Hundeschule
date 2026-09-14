@@ -135,10 +135,13 @@ Bitte nur im Notfall benutzen.
 
 * **„Passwort stimmt nicht"** – auf Groß- und Kleinschreibung achten. Nach 10 Fehlversuchen ist die
   Anmeldung 15 Minuten gesperrt.
-* **Passwort vergessen** – es lässt sich nicht auslesen, nur zurücksetzen. Dafür muss jemand mit
-  Cloudflare-Zugang im Speicher (KV → `hundeschule-inhalte`) den Eintrag `admin:passwort` löschen.
-  Danach erscheint beim nächsten Aufruf von `/admin` wieder der Willkommens-Bildschirm und du
-  vergibst ein neues. Deine Inhalte bleiben dabei unberührt.
+* **Passwort vergessen** – im Anmeldefenster auf **„Passwort vergessen?"** klicken. Dort stehen
+  die fünf Schritte: Der Eintrag `admin:passwort` im Cloudflare-Speicher wird gelöscht, danach
+  erscheint wieder der Willkommens-Bildschirm und du vergibst ein neues. Inhalte, Kurse und
+  Anfragen bleiben unberührt.
+* **Etwas sieht verschoben aus oder eine Änderung fehlt** – einmal mit **Strg+F5**
+  (Mac: **Cmd+Shift+R**) neu laden. Das holt die Seite frisch vom Server statt aus dem
+  Zwischenspeicher des Browsers.
 * **Änderung nicht sichtbar** – wurde auf **Speichern** geklickt? Steht grün „Gespeichert"?
   Dann eine Minute warten und die Seite neu laden.
 * **Seite fragt plötzlich wieder nach dem Passwort** – die 8 Stunden sind abgelaufen. Einfach neu

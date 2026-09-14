@@ -10,11 +10,14 @@
 /photos/*
   Cache-Control: public, max-age=2592000
 
+# Kurz halten und immer nachfragen: Sonst sehen wiederkehrende Besucher nach
+# einer Änderung noch stundenlang die alte Gestaltung. Die Dateien sind klein,
+# und unveränderte Inhalte beantwortet Cloudflare mit einem 304.
 /assets/css/*
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: public, no-cache
 
 /assets/js/*
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: public, no-cache
 
 /admin
   X-Robots-Tag: noindex, nofollow

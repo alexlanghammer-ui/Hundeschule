@@ -6,8 +6,8 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Verwaltung · Hundeschule</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/assets/css/site.css" />
-    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <link rel="stylesheet" href="/assets/css/site.css?v=2" />
+    <link rel="stylesheet" href="/assets/css/admin.css?v=2" />
   </head>
   <body class="admin">
     <!-- ------------------------------------------------------------ Login -->
@@ -32,6 +32,25 @@
         </div>
         <div class="alert alert--error" id="loginError" hidden></div>
         <button class="btn btn--dark btn--block" type="submit" id="loginSubmit">Anmelden</button>
+
+        <details class="hilfe">
+          <summary>Passwort vergessen?</summary>
+          <p>
+            Das Passwort lässt sich nicht auslesen – nur neu vergeben. Dafür brauchst du Zugang
+            zum Cloudflare-Konto:
+          </p>
+          <ol>
+            <li><a href="https://dash.cloudflare.com" target="_blank" rel="noopener">dash.cloudflare.com</a> öffnen</li>
+            <li>Linke Leiste: <strong>Storage &amp; Databases</strong> → <strong>KV</strong></li>
+            <li>Auf <strong>hundeschule-inhalte</strong> klicken, Reiter <strong>KV Pairs</strong></li>
+            <li>Den Eintrag <strong>admin:passwort</strong> suchen und löschen</li>
+            <li>Diese Seite neu laden – dann kannst du ein neues Passwort festlegen</li>
+          </ol>
+          <p>
+            Deine Inhalte, Kurse und Anfragen bleiben dabei unberührt. Es verschwindet wirklich
+            nur das Passwort.
+          </p>
+        </details>
       </form>
 
       <!-- Erstes Mal: Passwort selbst vergeben -->
@@ -324,6 +343,6 @@
       </details>
     </template>
 
-    <script src="/assets/js/admin.js" defer></script>
+    <script src="/assets/js/admin.js?v=2" defer></script>
   </body>
 </html>
