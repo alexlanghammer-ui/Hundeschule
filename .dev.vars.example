@@ -1,0 +1,13 @@
+# Kopie als .dev.vars anlegen (wird nicht eingecheckt) – nur fuer `npm run dev`.
+ADMIN_PASSWORD="bitte-aendern"
+SESSION_SECRET="langer-zufaelliger-string"
+SITE_URL="http://localhost:8788"
+
+# Mailversand (optional, ohne diese Werte landen Anfragen nur im Admin-Bereich)
+RESEND_API_KEY=""
+CONTACT_FROM="Hundeschule <anfrage@deine-domain.de>"
+CONTACT_TO=""
+
+# Spamschutz (optional)
+TURNSTILE_SITE_KEY=""
+TURNSTILE_SECRET_KEY=""

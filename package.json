@@ -1,0 +1,15 @@
+{
+  "name": "hundeschule-goller",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website der Hundeschule Alexandra Goller (Cloudflare Pages)",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev --port 8788",
+    "deploy": "wrangler pages deploy",
+    "check": "node scripts/check.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.42.0"
+  }
+}

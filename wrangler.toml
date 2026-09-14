@@ -1,0 +1,25 @@
+# Cloudflare Pages – Projektkonfiguration
+#
+# Lokale Entwicklung:  npm run dev
+# Deployment laeuft ueber die Git-Anbindung von Cloudflare Pages
+# (Build-Befehl leer lassen, Ausgabeverzeichnis: public).
+
+name = "hundeschule-goller"
+compatibility_date = "2025-09-01"
+pages_build_output_dir = "public"
+
+# Speicher fuer Inhalte und Formularanfragen.
+# id: im Cloudflare-Dashboard unter Storage & Databases > KV anlegen und hier eintragen.
+[[kv_namespaces]]
+binding = "SITE_KV"
+id = "HIER_KV_NAMESPACE_ID_EINTRAGEN"
+
+[vars]
+# Oeffentliche Adresse der Seite (fuer canonical-URLs, Sitemap und Open Graph).
+SITE_URL = "https://hundeschule-goller.pages.dev"
+
+# Alle Geheimnisse werden NICHT hier hinterlegt, sondern als Secret gesetzt:
+#   npx wrangler pages secret put ADMIN_PASSWORD
+#   npx wrangler pages secret put SESSION_SECRET
+#   npx wrangler pages secret put RESEND_API_KEY
+# oder im Dashboard unter Settings > Environment variables (Typ: Secret).

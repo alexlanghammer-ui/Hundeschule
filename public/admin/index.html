@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Verwaltung · Hundeschule</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/css/site.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin">
+    <!-- ------------------------------------------------------------ Login -->
+    <div class="login" id="loginView" hidden>
+      <form class="login__card" id="loginForm">
+        <span class="login__mark">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <ellipse cx="10" cy="19" rx="5.6" ry="7.4" transform="rotate(-18 10 19)" />
+            <ellipse cx="20" cy="12" rx="5.4" ry="7.6" transform="rotate(-7 20 12)" />
+            <ellipse cx="30.5" cy="12.6" rx="5.4" ry="7.6" transform="rotate(8 30.5 12.6)" />
+            <ellipse cx="39.5" cy="20.5" rx="5.6" ry="7.2" transform="rotate(20 39.5 20.5)" />
+            <path
+              d="M24.4 24c6.6 0 12.4 5.1 12.4 11 0 4.4-3.3 7-7.7 7-2.3 0-3.6-.8-4.7-.8s-2.4.8-4.7.8c-4.4 0-7.9-2.6-7.9-7 0-5.9 6-11 12.6-11Z"
+            />
+          </svg>
+        </span>
+        <h1>Verwaltung</h1>
+        <p class="login__hint">Preise, Termine und Kontaktdaten der Website pflegen.</p>
+        <div class="field">
+          <label for="password">Passwort</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <div class="alert alert--error" id="loginError" hidden></div>
+        <button class="btn btn--dark btn--block" type="submit" id="loginSubmit">Anmelden</button>
+      </form>
+    </div>
+
+    <!-- --------------------------------------------------------------- App -->
+    <div id="appView" hidden>
+      <header class="admin-bar">
+        <div class="admin-bar__inner">
+          <div class="admin-bar__brand">
+            <span class="admin-bar__dot"></span>
+            <span>Verwaltung</span>
+          </div>
+          <nav class="admin-tabs" id="tabs" aria-label="Bereiche">
+            <button type="button" class="admin-tab" data-tab="kontakt" aria-current="true">Kontakt</button>
+            <button type="button" class="admin-tab" data-tab="preise">Preise</button>
+            <button type="button" class="admin-tab" data-tab="kurse">Kurse &amp; Termine</button>
+            <button type="button" class="admin-tab" data-tab="anfragen">Anfragen</button>
+            <button type="button" class="admin-tab" data-tab="system">System</button>
+          </nav>
+          <div class="admin-bar__actions">
+            <span class="save-state" id="saveState"></span>
+            <button class="btn btn--dark btn--sm" type="button" id="saveBtn" disabled>Speichern</button>
+            <button class="btn btn--outline btn--sm" type="button" id="logoutBtn">Abmelden</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-main">
+        <div class="alert alert--error" id="globalError" hidden></div>
+        <div class="alert alert--warn" id="setupWarning" hidden></div>
+
+        <!-- Kontakt -->
+        <section class="panel-section" data-panel="kontakt">
+          <div class="section-head">
+            <h2>Kontaktdaten</h2>
+            <p>
+              Diese Angaben erscheinen in der Kopf- und Fußzeile, auf der Kontaktseite sowie
+              automatisch in Impressum und Datenschutz.
+            </p>
+          </div>
+          <div class="form-grid" id="kontaktFelder"></div>
+        </section>
+
+        <!-- Preise -->
+        <section class="panel-section" data-panel="preise" hidden>
+          <div class="section-head">
+            <h2>Preisliste</h2>
+            <p>Die Einträge erscheinen in dieser Reihenfolge auf der Seite „Preise“.</p>
+          </div>
+          <div class="rows" id="preisRows"></div>
+          <button class="btn btn--outline btn--sm" type="button" id="preisAdd">
+            + Preiszeile hinzufügen
+          </button>
+
+          <div class="section-head" style="margin-top: 34px">
+            <h2>Hinweise unter der Preisliste</h2>
+            <p>Ein Hinweis pro Zeile.</p>
+          </div>
+          <div class="field">
+            <textarea id="preisHinweise" rows="4"></textarea>
+          </div>
+        </section>
+
+        <!-- Kurse -->
+        <section class="panel-section" data-panel="kurse" hidden>
+          <div class="section-head">
+            <h2>Kurse &amp; Termine</h2>
+            <p>
+              Preis, Kurstage und Texte pro Kurs. Ausgeblendete Kurse verschwinden von der Website,
+              bleiben hier aber erhalten.
+            </p>
+          </div>
+          <div id="kursListe"></div>
+          <button class="btn btn--outline btn--sm" type="button" id="kursAdd">
+            + Neuen Kurs anlegen
+          </button>
+        </section>
+
+        <!-- Anfragen -->
+        <section class="panel-section" data-panel="anfragen" hidden>
+          <div class="section-head">
+            <h2>Eingegangene Anfragen</h2>
+            <p>
+              Jede Anfrage über das Kontaktformular wird hier 180 Tage lang aufbewahrt – auch wenn
+              der Mailversand einmal klemmt.
+            </p>
+          </div>
+          <button class="btn btn--outline btn--sm" type="button" id="anfragenReload">
+            Neu laden
+          </button>
+          <div id="anfragenListe" class="anfragen"></div>
+        </section>
+
+        <!-- System -->
+        <section class="panel-section" data-panel="system" hidden>
+          <div class="section-head">
+            <h2>Systemstatus</h2>
+            <p>Was ist eingerichtet, was fehlt noch?</p>
+          </div>
+          <div id="statusListe" class="status-list"></div>
+
+          <div class="section-head" style="margin-top: 34px">
+            <h2>Zurücksetzen</h2>
+            <p>
+              Setzt <strong>alle</strong> Inhalte auf den Auslieferungszustand zurück. Eingegangene
+              Anfragen bleiben erhalten.
+            </p>
+          </div>
+          <button class="btn btn--outline btn--sm" type="button" id="resetBtn">
+            Inhalte zurücksetzen
+          </button>
+        </section>
+      </main>
+    </div>
+
+    <template id="preisRowTpl">
+      <div class="row">
+        <div class="field row__grow">
+          <label>Leistung</label>
+          <input type="text" data-field="l" />
+        </div>
+        <div class="field row__price">
+          <label>Preis</label>
+          <input type="text" data-field="r" placeholder="70,- € / 60 Min." />
+        </div>
+        <div class="row__tools">
+          <button type="button" data-act="up" title="Nach oben" aria-label="Nach oben">↑</button>
+          <button type="button" data-act="down" title="Nach unten" aria-label="Nach unten">↓</button>
+          <button type="button" data-act="del" title="Entfernen" aria-label="Entfernen">✕</button>
+        </div>
+      </div>
+    </template>
+
+    <template id="kursTpl">
+      <details class="kurs">
+        <summary class="kurs__head">
+          <span class="kurs__title">Kurs</span>
+          <span class="kurs__meta"></span>
+          <span class="kurs__flag" hidden>ausgeblendet</span>
+        </summary>
+        <div class="kurs__body">
+          <div class="form-grid">
+            <div class="field">
+              <label>Kursname</label>
+              <input type="text" data-field="title" />
+            </div>
+            <div class="field">
+              <label>Kennzeichnung (Badge)</label>
+              <input type="text" data-field="badge" placeholder="Junghunde" />
+            </div>
+            <div class="field">
+              <label>Umfang</label>
+              <input type="text" data-field="umfang" placeholder="7 x 60 Min." />
+            </div>
+            <div class="field">
+              <label>Kursbeginn</label>
+              <input type="text" data-field="start" placeholder="ab 13.04.2026" />
+            </div>
+            <div class="field">
+              <label>Preis (Kurzform)</label>
+              <input type="text" data-field="preis" placeholder="195,- €" />
+            </div>
+            <div class="field">
+              <label>Adresse im Web (Slug)</label>
+              <input type="text" data-field="slug" placeholder="junghundekurs" />
+              <p class="hint">/kurse/<span data-preview="slug"></span></p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Kurstage / Termine</label>
+            <textarea data-field="termine" rows="2" placeholder="Montag, den 13.04., 27.04., … um 18 Uhr"></textarea>
+            <p class="hint">Steht groß auf der Kursseite – hier die konkreten Tage eintragen.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>Kursgebühr (ausführlich)</label>
+              <input type="text" data-field="gebuehr" placeholder="7 x 60 Min., Unterlagen: 195,- € inkl. MwSt." />
+            </div>
+            <div class="field">
+              <label>Trainingsort</label>
+              <input type="text" data-field="ort" />
+            </div>
+            <div class="field">
+              <label>Trainerin (falls abweichend)</label>
+              <input type="text" data-field="trainerin" />
+            </div>
+            <div class="field">
+              <label>Voraussetzungen</label>
+              <input type="text" data-field="voraussetzung" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Kurzbeschreibung (Kursübersicht)</label>
+            <textarea data-field="teaser" rows="2"></textarea>
+          </div>
+          <div class="field">
+            <label>Claim (eine Zeile unter der Überschrift)</label>
+            <input type="text" data-field="claim" />
+          </div>
+          <div class="field">
+            <label>Beschreibung</label>
+            <textarea data-field="body" rows="7"></textarea>
+            <p class="hint">Absätze durch eine Leerzeile trennen.</p>
+          </div>
+          <div class="field">
+            <label>Kursinhalte</label>
+            <textarea data-field="inhalte" rows="7"></textarea>
+            <p class="hint">Ein Punkt pro Zeile. Leer lassen, wenn keine Liste erscheinen soll.</p>
+          </div>
+
+          <div class="kurs__foot">
+            <label class="switch">
+              <input type="checkbox" data-field="sichtbar" />
+              <span>Auf der Website anzeigen</span>
+            </label>
+            <div class="row__tools">
+              <button type="button" data-act="up" title="Nach oben" aria-label="Nach oben">↑</button>
+              <button type="button" data-act="down" title="Nach unten" aria-label="Nach unten">↓</button>
+              <button type="button" data-act="del" class="danger">Kurs löschen</button>
+            </div>
+          </div>
+        </div>
+      </details>
+    </template>
+
+    <script src="/assets/js/admin.js" defer></script>
+  </body>
+</html>
