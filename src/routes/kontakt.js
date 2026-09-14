@@ -1,14 +1,14 @@
 /**
- * Kontaktformular.
+ * Kontaktformular (/api/kontakt).
  *
  * Ablauf: pruefen -> im KV ablegen -> per Resend zustellen.
  * Die Ablage im KV passiert zuerst, damit keine Anfrage verloren geht, falls
  * der Mailversand gerade klemmt. Im Admin-Bereich sind alle Anfragen sichtbar.
  */
 
-import { getContent } from '../../src/lib/content.js';
-import { anfrageMail, bestaetigungsMail, sendMail, mailConfigured } from '../../src/lib/mail.js';
-import { clientIp, jsonResponse, rateLimit } from '../../src/lib/auth.js';
+import { getContent } from '../lib/content.js';
+import { anfrageMail, bestaetigungsMail, sendMail, mailConfigured } from '../lib/mail.js';
+import { clientIp, jsonResponse, rateLimit } from '../lib/auth.js';
 
 const MAX_BODY = 20_000;
 const ANFRAGE_TTL = 60 * 60 * 24 * 180; // 180 Tage
@@ -62,8 +62,7 @@ async function pruefeTurnstile(env, token, ip) {
   }
 }
 
-export async function onRequestPost(context) {
-  const { request, env } = context;
+async function anfrageEmpfangen(request, env) {
   const ip = clientIp(request);
 
   let daten;
@@ -206,7 +205,14 @@ export async function onRequestPost(context) {
   });
 }
 
-/** GET auf diesen Pfad gehoert auf die Kontaktseite. */
-export function onRequestGet(context) {
-  return Response.redirect(new URL('/kontakt', context.request.url).toString(), 302);
+/** Einstieg aus dem Worker: POST nimmt die Anfrage an, GET fuehrt zur Kontaktseite. */
+export function handleKontakt(request, env) {
+  if (request.method === 'POST') return anfrageEmpfangen(request, env);
+  if (request.method === 'GET') {
+    return Response.redirect(new URL('/kontakt', request.url).toString(), 302);
+  }
+  return jsonResponse(
+    { ok: false, error: 'Methode nicht erlaubt.' },
+    { status: 405, headers: { Allow: 'GET, POST' } }
+  );
 }

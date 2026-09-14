@@ -1,14 +1,17 @@
 /**
- * Seiten-Router (Cloudflare Pages Function).
+ * Seiten-Router.
  *
- * Alle Seiten werden direkt am Edge gerendert – damit stehen gepflegte Preise,
- * Termine und Kontaktdaten sofort im HTML (gut fuer Suchmaschinen) und es gibt
- * keinen Build-Schritt.
+ * Alle Seiten werden bei jedem Aufruf am Edge gerendert – damit stehen
+ * gepflegte Preise, Termine und Kontaktdaten sofort im HTML (gut fuer
+ * Suchmaschinen) und es gibt keinen Build-Schritt.
+ *
+ * Statische Dateien (CSS, Bilder, /admin) liefert Cloudflare direkt aus und
+ * dieser Code wird dafuer gar nicht erst aufgerufen.
  */
 
-import { getContent, sichtbareKurse } from '../src/lib/content.js';
-import { layout, NAV } from '../src/render/layout.js';
-import * as pages from '../src/render/pages.js';
+import { getContent, sichtbareKurse } from '../lib/content.js';
+import { layout, NAV } from '../render/layout.js';
+import * as pages from '../render/pages.js';
 
 const HTML_CACHE = 'public, max-age=0, s-maxage=60, stale-while-revalidate=600';
 
@@ -55,20 +58,18 @@ ${urls}
 </urlset>`;
 }
 
-export async function onRequestGet(context) {
-  const { request, env, next } = context;
-  const url = new URL(request.url);
-  let path = decodeURIComponent(url.pathname);
-
-  // Statische Dateien durchreichen
-  if (path.startsWith('/assets/') || path.startsWith('/photos/') || path.startsWith('/admin')) {
-    return next();
+export async function handleSeite(request, env, path, url) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return new Response('Methode nicht erlaubt', {
+      status: 405,
+      headers: { Allow: 'GET, HEAD' },
+    });
   }
 
   // Abschließenden Schrägstrich entfernen (/kurse/ -> /kurse)
   if (path.length > 1 && path.endsWith('/')) {
-    const target = path.replace(/\/+$/, '') + url.search;
-    return Response.redirect(`${url.origin}${target}`, 301);
+    const ziel = path.replace(/\/+$/, '') + url.search;
+    return Response.redirect(`${url.origin}${ziel}`, 301);
   }
 
   const content = await getContent(env);
@@ -141,15 +142,8 @@ export async function onRequestGet(context) {
   }
 
   if (!page) {
-    // Vielleicht doch eine statische Datei (favicon.svg, robots.txt, …)
-    const asset = await next();
-    if (asset.status !== 404) return asset;
-
     const notFound = pages.nichtGefunden(content);
-    return htmlResponse(
-      layout({ ...notFound, path, content, siteUrl, noindex: true }),
-      404
-    );
+    return htmlResponse(layout({ ...notFound, path, content, siteUrl, noindex: true }), 404);
   }
 
   return htmlResponse(layout({ ...page, path, content, siteUrl }));
