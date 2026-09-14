@@ -131,14 +131,21 @@ nur empfangen, nicht senden.
 1. Bei [resend.com](https://resend.com) registrieren.
 2. **Domains → Add Domain**, die eigene Domain eintragen und die angezeigten DNS-Einträge
    (SPF, DKIM, optional DMARC) bei Cloudflare DNS hinterlegen. Nach der Verifizierung ist der
-   Versand freigeschaltet.
-3. **API Keys → Create API Key** (Berechtigung „Sending access“ genügt) und als `RESEND_API_KEY`
-   im Worker-Projekt hinterlegen.
-4. `CONTACT_FROM` auf eine Adresse dieser Domain setzen.
+   Versand freigeschaltet. *(Ohne eigene Domain lässt sich nur an die eigene Kontoadresse
+   senden – gut zum Ausprobieren, nicht für den Betrieb.)*
+3. **API Keys → Create API Key**, Berechtigung „Sending access“ genügt.
+4. Im Admin-Bereich der Website unter **System → Mailversand** den Schlüssel, die
+   Absenderadresse und optional eine abweichende Empfängeradresse eintragen und speichern.
+5. Auf **Testmail schicken** klicken – kommt sie an, ist alles fertig.
+
+> ⚠️ Den Schlüssel **nicht** als Secret im Cloudflare-Dashboard hinterlegen: Dort überlebt er
+> keinen Deploy (siehe 2.3). Im Admin-Bereich eingetragen landet er im KV und bleibt.
+> `RESEND_API_KEY`, `CONTACT_FROM` und `CONTACT_TO` funktionieren weiterhin und haben Vorrang –
+> dann sind die Felder im Admin-Bereich gesperrt.
 
 **Ohne diese Einrichtung funktioniert das Formular trotzdem**: Die Anfrage wird gespeichert und ist
-im Admin-Bereich unter „Anfragen“ sichtbar – sie wird nur nicht per Mail zugestellt. Im Reiter
-„System“ steht jederzeit, was noch fehlt.
+im Admin-Bereich unter „Anfragen“ sichtbar – sie wird nur nicht per Mail zugestellt. Jede Anfrage
+trägt dort den Zustellstatus, bei Problemen samt Fehlermeldung von Resend.
 
 **Spamschutz** ist dreifach eingebaut und ohne weitere Einrichtung aktiv: ein unsichtbares
 Honeypot-Feld, eine Mindest-Ausfüllzeit und ein Limit von 5 Anfragen pro Stunde und IP-Adresse.

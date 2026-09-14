@@ -7,7 +7,7 @@
  */
 
 import { getContent } from '../lib/content.js';
-import { anfrageMail, bestaetigungsMail, sendMail, mailConfigured } from '../lib/mail.js';
+import { anfrageMail, bestaetigungsMail, getMailConfig, sendMail } from '../lib/mail.js';
 import { clientIp, jsonResponse, rateLimit } from '../lib/auth.js';
 
 const MAX_BODY = 20_000;
@@ -148,7 +148,8 @@ async function anfrageEmpfangen(request, env) {
   }
 
   const content = await getContent(env);
-  const empfaenger = env.CONTACT_TO || content.kontakt.email;
+  const mailConfig = await getMailConfig(env);
+  const empfaenger = mailConfig.to || content.kontakt.email;
   const mail = anfrageMail(anfrage, content.kontakt.betrieb || content.kontakt.name);
   const versand = await sendMail(env, {
     to: empfaenger,
@@ -163,7 +164,7 @@ async function anfrageEmpfangen(request, env) {
   }
 
   // Eingangsbestaetigung an die anfragende Person (nur bei E-Mail-Adresse)
-  if (versand.ok && istEmail(kontaktweg) && env.SEND_CONFIRMATION !== 'false') {
+  if (versand.ok && istEmail(kontaktweg) && mailConfig.bestaetigung) {
     const best = bestaetigungsMail(anfrage, content.kontakt);
     const bestVersand = await sendMail(env, {
       to: kontaktweg,
@@ -201,7 +202,7 @@ async function anfrageEmpfangen(request, env) {
   return antwort(true, {
     gespeichert: Boolean(env.SITE_KV),
     zugestellt: versand.ok,
-    hinweis: mailConfigured(env) ? undefined : 'Mailversand ist noch nicht eingerichtet.',
+    hinweis: mailConfig.apiKey && mailConfig.from ? undefined : 'Mailversand ist noch nicht eingerichtet.',
   });
 }
 

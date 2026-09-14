@@ -6,7 +6,14 @@
 import assert from 'node:assert/strict';
 import { sanitize, slugify, kursMeta, fillPlaceholders, DEFAULTS } from '../src/lib/content.js';
 import { esc, html, raw, toString, telHref } from '../src/lib/html.js';
-import { anfrageMail, bestaetigungsMail, sendMail, mailConfigured } from '../src/lib/mail.js';
+import {
+  anfrageMail,
+  bestaetigungsMail,
+  getMailConfig,
+  mailConfigured,
+  saveMailConfig,
+  sendMail,
+} from '../src/lib/mail.js';
 
 let bestanden = 0;
 const fehler = [];
@@ -154,16 +161,106 @@ test('bestaetigungsMail nennt Name und Rueckrufnummer', () => {
   assert.ok(mail.html.includes('tel:+4917643198863'));
 });
 
-test('mailConfigured erkennt fehlende Konfiguration', () => {
-  assert.equal(mailConfigured({}), false);
-  assert.equal(mailConfigured({ RESEND_API_KEY: 'k' }), false);
-  assert.equal(mailConfigured({ RESEND_API_KEY: 'k', CONTACT_FROM: 'a@b.de' }), true);
+/** Minimaler KV-Ersatz fuer die Tests. */
+function fakeKV(inhalt = {}) {
+  const daten = new Map(Object.entries(inhalt));
+  return {
+    async get(key, opts) {
+      const wert = daten.get(key);
+      if (wert === undefined) return null;
+      return opts && opts.type === 'json' ? JSON.parse(wert) : wert;
+    },
+    async put(key, wert) {
+      daten.set(key, wert);
+    },
+    async delete(key) {
+      daten.delete(key);
+    },
+    _daten: daten,
+  };
+}
+
+await testAsync('mailConfigured erkennt fehlende Konfiguration', async () => {
+  assert.equal(await mailConfigured({}), false);
+  assert.equal(await mailConfigured({ RESEND_API_KEY: 'k' }), false);
+  assert.equal(await mailConfigured({ RESEND_API_KEY: 'k', CONTACT_FROM: 'a@b.de' }), true);
+});
+
+await testAsync('Mail-Einstellungen überleben im KV', async () => {
+  const env = { SITE_KV: fakeKV() };
+  assert.equal(await saveMailConfig(env, { apiKey: 're_test123', from: 'Schule <a@b.de>', to: 'z@b.de' }), null);
+  const config = await getMailConfig(env);
+  assert.equal(config.apiKey, 're_test123');
+  assert.equal(config.from, 'Schule <a@b.de>');
+  assert.equal(config.to, 'z@b.de');
+  assert.equal(config.quelle, 'gespeichert');
+  assert.equal(await mailConfigured(env), true);
+});
+
+await testAsync('Leeres Schlüsselfeld lässt den Schlüssel unverändert', async () => {
+  const env = { SITE_KV: fakeKV() };
+  await saveMailConfig(env, { apiKey: 're_bleibt', from: 'a@b.de' });
+  await saveMailConfig(env, { apiKey: '', from: 'neu@b.de' });
+  const config = await getMailConfig(env);
+  assert.equal(config.apiKey, 're_bleibt');
+  assert.equal(config.from, 'neu@b.de');
+});
+
+await testAsync('saveMailConfig weist unsinnige Eingaben ab', async () => {
+  const env = { SITE_KV: fakeKV() };
+  assert.match(await saveMailConfig(env, { apiKey: 'falscher-schluessel' }), /re_/);
+  assert.match(await saveMailConfig(env, { from: 'keine-adresse' }), /Absenderadresse/);
+  assert.match(await saveMailConfig(env, { to: 'auch-keine' }), /Empfängeradresse/);
+});
+
+await testAsync('Umgebungsvariablen haben Vorrang vor dem Gespeicherten', async () => {
+  const env = { SITE_KV: fakeKV(), RESEND_API_KEY: 're_umgebung', CONTACT_FROM: 'env@b.de' };
+  await saveMailConfig(env, { from: 'kv@b.de', to: 'ziel@b.de' });
+  const config = await getMailConfig(env);
+  assert.equal(config.apiKey, 're_umgebung');
+  assert.equal(config.from, 'env@b.de');
+  assert.equal(config.to, 'ziel@b.de');
+  assert.equal(config.quelle, 'umgebung');
+});
+
+await testAsync('Der API-Schlüssel wird nie im Klartext ausgeliefert', async () => {
+  const env = { SITE_KV: fakeKV() };
+  await saveMailConfig(env, { apiKey: 're_geheim', from: 'a@b.de' });
+  const { handleAdmin } = await import('../src/routes/admin.js');
+  const antwort = await handleAdmin(
+    new Request('https://example.test/api/admin/mail', {
+      headers: { 'X-Requested-With': 'hundeschule-admin' },
+    }),
+    env,
+    '/api/admin/mail'
+  );
+  const text = await antwort.text();
+  assert.ok(!text.includes('re_geheim'), 'Schlüssel darf nicht in der Antwort stehen');
 });
 
 await testAsync('sendMail ohne Konfiguration versendet nichts', async () => {
   const res = await sendMail({}, { to: 'a@b.de', subject: 's', html: 'h', text: 't' });
   assert.equal(res.ok, false);
   assert.equal(res.skipped, true);
+});
+
+await testAsync('sendMail nutzt die im Admin-Bereich hinterlegten Daten', async () => {
+  const env = { SITE_KV: fakeKV() };
+  await saveMailConfig(env, { apiKey: 're_ausdemkv', from: 'Schule <kv@b.de>' });
+  const echt = globalThis.fetch;
+  let gesehen = null;
+  globalThis.fetch = async (url, init) => {
+    gesehen = init;
+    return new Response(JSON.stringify({ id: 'kv1' }), { status: 200 });
+  };
+  try {
+    const res = await sendMail(env, { to: 'z@b.de', subject: 's', html: 'h', text: 't' });
+    assert.equal(res.ok, true);
+    assert.equal(gesehen.headers.Authorization, 'Bearer re_ausdemkv');
+    assert.equal(JSON.parse(gesehen.body).from, 'Schule <kv@b.de>');
+  } finally {
+    globalThis.fetch = echt;
+  }
 });
 
 await testAsync('sendMail schickt die richtige Nutzlast an Resend', async () => {

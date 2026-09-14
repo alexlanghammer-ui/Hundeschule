@@ -132,6 +132,7 @@
       s.hidden = s.getAttribute('data-panel') !== ziel;
     });
     if (ziel === 'anfragen') ladeAnfragen();
+    if (ziel === 'system') ladeMail();
   });
 
   /* ------------------------------------------------------------ Änderungen */
@@ -483,6 +484,94 @@
 
   el('anfragenReload').addEventListener('click', ladeAnfragen);
 
+  /* -------------------------------------------------------------- Mailversand */
+  function mailMeldung(art, text) {
+    setzeSichtbar('mailOk', art === 'ok');
+    setzeSichtbar('mailError', art === 'fehler');
+    if (art === 'ok') el('mailOk').textContent = text;
+    if (art === 'fehler') el('mailError').textContent = text;
+  }
+
+  /** Feld sperren und erklären, wenn der Wert aus der Cloudflare-Umgebung kommt. */
+  function sperreWennAusUmgebung(id, ausUmgebung, bezeichnung) {
+    var feld = el(id);
+    feld.disabled = Boolean(ausUmgebung);
+    var hinweisId = id + 'Hint';
+    var hinweis = el(hinweisId);
+    if (ausUmgebung && hinweis) {
+      hinweis.textContent =
+        bezeichnung + ' ist in der Cloudflare-Umgebung gesetzt und hat Vorrang – ' +
+        'hier lässt er sich deshalb nicht ändern.';
+    } else if (ausUmgebung && !hinweis) {
+      var neuerHinweis = document.createElement('p');
+      neuerHinweis.className = 'hint';
+      neuerHinweis.id = hinweisId;
+      neuerHinweis.textContent =
+        bezeichnung + ' ist in der Cloudflare-Umgebung gesetzt und hat Vorrang.';
+      feld.parentNode.appendChild(neuerHinweis);
+    }
+  }
+
+  function ladeMail() {
+    api('/api/admin/mail')
+      .then(function (data) {
+        el('mailFrom').value = data.from || '';
+        el('mailTo').value = data.to || '';
+        el('mailBestaetigung').checked = data.bestaetigung !== false;
+        el('mailKey').placeholder = data.apiKeyGesetzt ? '•••••••• (hinterlegt)' : 're_...';
+        el('mailKeyHint').textContent = data.apiKeyGesetzt
+          ? 'Ein Schlüssel ist hinterlegt. Feld leer lassen = unverändert; neuen eintragen = ersetzen.'
+          : 'Aus resend.com unter „API Keys“. Wird gespeichert und nie wieder angezeigt.';
+        // Werte aus der Cloudflare-Umgebung haben Vorrang. Dann das Feld sperren,
+        // statt eine Eingabe anzunehmen, die anschließend wirkungslos wäre.
+        var umgebung = data.ausUmgebung || {};
+        sperreWennAusUmgebung('mailKey', umgebung.apiKey, 'Der Schlüssel');
+        sperreWennAusUmgebung('mailFrom', umgebung.from, 'Der Absender');
+        sperreWennAusUmgebung('mailTo', umgebung.to, 'Der Empfänger');
+      })
+      .catch(function (err) { mailMeldung('fehler', err.message); });
+  }
+
+  el('mailForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = el('mailSubmit');
+    btn.disabled = true;
+    mailMeldung('', '');
+    api('/api/admin/mail', {
+      method: 'POST',
+      body: JSON.stringify({
+        apiKey: el('mailKey').value,
+        from: el('mailFrom').value,
+        to: el('mailTo').value,
+        bestaetigung: el('mailBestaetigung').checked,
+      }),
+    })
+      .then(function () {
+        el('mailKey').value = '';
+        mailMeldung('ok', 'Gespeichert. Schick dir am besten gleich eine Testmail.');
+        ladeMail();
+      })
+      .catch(function (err) { mailMeldung('fehler', err.message); })
+      .then(function () { btn.disabled = false; });
+  });
+
+  el('mailTest').addEventListener('click', function () {
+    var btn = el('mailTest');
+    var label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Wird geschickt…';
+    mailMeldung('', '');
+    api('/api/admin/mailtest', { method: 'POST' })
+      .then(function (data) {
+        mailMeldung(
+          'ok',
+          'Testmail an ' + data.empfaenger + ' geschickt. Schau ins Postfach – und in den Spam-Ordner.'
+        );
+      })
+      .catch(function (err) { mailMeldung('fehler', 'Versand fehlgeschlagen: ' + err.message); })
+      .then(function () { btn.disabled = false; btn.textContent = label; });
+  });
+
   /* ------------------------------------------------------------ Passwort */
   el('passwortForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -525,8 +614,9 @@
     ],
     mail: [
       'Mailversand',
-      'RESEND_API_KEY und CONTACT_FROM im Cloudflare-Dashboard. Ohne diese landen Anfragen ' +
-        'nur unter „Anfragen“.',
+      'Trägt Anfragen aus dem Kontaktformular in dein Postfach. Einzurichten weiter unten ' +
+        'auf dieser Seite. Fehlt er, gehen keine Anfragen verloren – sie stehen dann nur im ' +
+        'Reiter „Anfragen“.',
     ],
     turnstile: ['Spamschutz Turnstile', 'TURNSTILE_SITE_KEY und TURNSTILE_SECRET_KEY (optional).'],
   };

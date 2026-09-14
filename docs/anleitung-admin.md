@@ -121,14 +121,36 @@ Hier stehen alle Nachrichten aus dem Kontaktformular der letzten 180 Tage – ne
 
 ## System
 
-Zeigt mit grünem oder orangem Punkt, was eingerichtet ist: Passwort, Speicher, Mailversand,
-Spamschutz. Orange bedeutet nicht, dass die Website kaputt ist – nur dass diese eine Funktion noch
-fehlt. Die technische Einrichtung ist in der `README.md` beschrieben.
+Zeigt mit grünem oder orangem Punkt, was eingerichtet ist. Orange heißt nicht, dass etwas kaputt
+ist – nur dass diese Funktion noch fehlt.
 
-Hier findest du außerdem **Passwort ändern** (bisheriges Passwort eingeben, neues zweimal).
+### Mailversand einrichten
 
-Ganz unten steht **Inhalte zurücksetzen**. Das stellt *alle* Texte, Preise und Kurse auf den
-Auslieferungszustand zurück. Eingegangene Anfragen und dein Passwort bleiben erhalten.
+Damit Anfragen aus dem Kontaktformular in deinem Postfach landen:
+
+1. Bei [resend.com](https://resend.com) ein Konto anlegen (kostenlos).
+2. Dort **Domains → Add Domain**: deine Domain eintragen. Resend zeigt dann ein paar
+   DNS-Einträge an, die bei Cloudflare hinterlegt werden müssen – das ist der technische Teil,
+   dabei hilft dir am besten jemand, der sich damit auskennt.
+3. Dort **API Keys → Create API Key**. Der Schlüssel beginnt mit `re_`. **Einmal kopieren —
+   Resend zeigt ihn nur ein einziges Mal an.**
+4. Hier im Reiter **System** unter „Mailversand“ eintragen:
+   * **Resend API-Schlüssel**: den kopierten Schlüssel
+   * **Absender**: z. B. `Hundeschule <anfrage@deine-domain.de>` — muss deine verifizierte Domain sein
+   * **Empfänger**: dein Postfach. Leer lassen = die E-Mail-Adresse aus dem Reiter „Kontakt“
+5. **Speichern**, dann **Testmail schicken**. Kommt sie an, ist es fertig.
+
+Findest du die Testmail nicht, schau im **Spam-Ordner** nach.
+
+Der Schlüssel wird nach dem Speichern nie wieder angezeigt. Willst du ihn später austauschen,
+trägst du einfach einen neuen ein; lässt du das Feld leer, bleibt der alte bestehen.
+
+### Weitere Punkte hier
+
+**Passwort ändern** – bisheriges Passwort eingeben, neues zweimal.
+
+**Inhalte zurücksetzen** – ganz unten. Stellt *alle* Texte, Preise und Kurse auf den
+Auslieferungszustand zurück. Anfragen, Passwort und Maileinstellungen bleiben erhalten.
 Bitte nur im Notfall benutzen.
 
 ## Wenn etwas nicht klappt

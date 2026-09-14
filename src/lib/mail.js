@@ -10,22 +10,81 @@
 import { esc } from './html.js';
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails';
+const MAIL_KEY = 'admin:mail';
 
-export function mailConfigured(env) {
-  return Boolean(env && env.RESEND_API_KEY && env.CONTACT_FROM);
+/**
+ * Zugangsdaten fuer den Versand.
+ *
+ * Bevorzugt werden Umgebungsvariablen; sonst kommt die im Admin-Bereich
+ * hinterlegte Konfiguration aus dem KV zum Zug. Letzteres ist der Normalfall:
+ * Bei Git-gekoppelten Workers ueberschreibt jeder Deploy die im Dashboard
+ * gesetzten Secrets.
+ */
+export async function getMailConfig(env) {
+  let gespeichert = null;
+  if (env && env.SITE_KV) {
+    try {
+      gespeichert = await env.SITE_KV.get(MAIL_KEY, { type: 'json' });
+    } catch (err) {
+      console.error('Mail-Einstellungen nicht lesbar:', err && err.message);
+    }
+  }
+  const g = gespeichert || {};
+  return {
+    apiKey: env.RESEND_API_KEY || g.apiKey || '',
+    from: env.CONTACT_FROM || g.from || '',
+    to: env.CONTACT_TO || g.to || '',
+    bestaetigung:
+      env.SEND_CONFIRMATION === 'false' ? false : g.bestaetigung === false ? false : true,
+    quelle: env.RESEND_API_KEY ? 'umgebung' : g.apiKey ? 'gespeichert' : 'keine',
+  };
+}
+
+export async function saveMailConfig(env, eingabe) {
+  if (!env.SITE_KV) return 'Der Speicher ist nicht verbunden.';
+  const vorher = (await getMailConfig(env)) || {};
+  const apiKey = String(eingabe.apiKey || '').trim();
+  const neu = {
+    // Leer gelassenes Schluesselfeld bedeutet „unveraendert lassen“.
+    apiKey: apiKey || (env.RESEND_API_KEY ? '' : vorher.apiKey || ''),
+    from: String(eingabe.from || '').trim().slice(0, 200),
+    to: String(eingabe.to || '').trim().slice(0, 200),
+    bestaetigung: eingabe.bestaetigung !== false,
+  };
+  if (neu.apiKey && !/^re_/.test(neu.apiKey)) {
+    return 'Der Schlüssel sieht nicht nach einem Resend-Schlüssel aus – er beginnt mit „re_“.';
+  }
+  if (neu.from && !/<?[^\s@]+@[^\s@]+\.[a-z]{2,}>?$/i.test(neu.from)) {
+    return 'Die Absenderadresse ist nicht gültig.';
+  }
+  if (neu.to && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(neu.to)) {
+    return 'Die Empfängeradresse ist nicht gültig.';
+  }
+  await env.SITE_KV.put(MAIL_KEY, JSON.stringify(neu));
+  return null;
+}
+
+export async function mailConfigured(env) {
+  const config = await getMailConfig(env);
+  return Boolean(config.apiKey && config.from);
 }
 
 /**
  * @returns {Promise<{ok: boolean, id?: string, skipped?: boolean, error?: string}>}
  */
 export async function sendMail(env, { to, replyTo, subject, html, text }) {
-  if (!mailConfigured(env)) {
-    return { ok: false, skipped: true, error: 'RESEND_API_KEY oder CONTACT_FROM nicht gesetzt' };
+  const config = await getMailConfig(env);
+  if (!config.apiKey || !config.from) {
+    return {
+      ok: false,
+      skipped: true,
+      error: 'Mailversand ist noch nicht eingerichtet (Schlüssel oder Absender fehlt)',
+    };
   }
   if (!to) return { ok: false, error: 'Keine Empfaengeradresse hinterlegt' };
 
   const payload = {
-    from: env.CONTACT_FROM,
+    from: config.from,
     to: [to],
     subject,
     html,
@@ -37,7 +96,7 @@ export async function sendMail(env, { to, replyTo, subject, html, text }) {
     const res = await fetch(RESEND_ENDPOINT, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        Authorization: `Bearer ${config.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),

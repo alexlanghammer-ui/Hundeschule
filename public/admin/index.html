@@ -6,8 +6,8 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Verwaltung · Hundeschule</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/assets/css/site.css?v=2" />
-    <link rel="stylesheet" href="/assets/css/admin.css?v=2" />
+    <link rel="stylesheet" href="/assets/css/site.css?v=3" />
+    <link rel="stylesheet" href="/assets/css/admin.css?v=3" />
   </head>
   <body class="admin">
     <!-- ------------------------------------------------------------ Login -->
@@ -191,6 +191,49 @@
           <div id="statusListe" class="status-list"></div>
 
           <div class="section-head" style="margin-top: 34px">
+            <h2>Mailversand (Resend)</h2>
+            <p>
+              Damit Anfragen aus dem Kontaktformular in deinem Postfach landen. Ohne das hier
+              funktioniert das Formular trotzdem – die Anfragen stehen dann nur im Reiter
+              „Anfragen“.
+            </p>
+          </div>
+          <form class="form-grid" id="mailForm" style="max-width: 720px">
+            <div class="field" style="grid-column: 1 / -1">
+              <label for="mailKey">Resend API-Schlüssel</label>
+              <input id="mailKey" type="password" autocomplete="off" placeholder="re_..." />
+              <p class="hint" id="mailKeyHint">
+                Aus resend.com unter „API Keys“. Wird verschlüsselt gespeichert und nie wieder
+                angezeigt.
+              </p>
+            </div>
+            <div class="field">
+              <label for="mailFrom">Absender</label>
+              <input id="mailFrom" type="text" placeholder="Hundeschule &lt;anfrage@deine-domain.de&gt;" />
+              <p class="hint">Die Domain muss in Resend verifiziert sein.</p>
+            </div>
+            <div class="field">
+              <label for="mailTo">Empfänger</label>
+              <input id="mailTo" type="email" placeholder="leer = E-Mail aus „Kontakt“" />
+              <p class="hint">Dorthin gehen die Anfragen.</p>
+            </div>
+            <div class="field" style="grid-column: 1 / -1">
+              <label class="switch">
+                <input type="checkbox" id="mailBestaetigung" />
+                <span>Anfragenden automatisch eine Eingangsbestätigung schicken</span>
+              </label>
+            </div>
+            <div class="field" style="grid-column: 1 / -1; flex-direction: row; gap: 8px">
+              <button class="btn btn--dark btn--sm" type="submit" id="mailSubmit">Speichern</button>
+              <button class="btn btn--outline btn--sm" type="button" id="mailTest">
+                Testmail schicken
+              </button>
+            </div>
+          </form>
+          <div class="alert alert--ok" id="mailOk" hidden></div>
+          <div class="alert alert--error" id="mailError" hidden></div>
+
+          <div class="section-head" style="margin-top: 34px">
             <h2>Passwort ändern</h2>
             <p>Gilt sofort. Andere angemeldete Geräte bleiben bis zum Ablauf ihrer Sitzung drin.</p>
           </div>
@@ -343,6 +386,6 @@
       </details>
     </template>
 
-    <script src="/assets/js/admin.js?v=2" defer></script>
+    <script src="/assets/js/admin.js?v=3" defer></script>
   </body>
 </html>

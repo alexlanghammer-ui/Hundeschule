@@ -16,6 +16,7 @@ import {
   setzePasswort,
 } from '../lib/auth.js';
 import { DEFAULTS, getContent, putContent } from '../lib/content.js';
+import { getMailConfig, saveMailConfig, sendMail } from '../lib/mail.js';
 
 const PRAEFIX = 'anfrage:';
 
@@ -140,6 +141,7 @@ async function passwortAendern(request, env) {
 /** Sagt der Admin-Oberflaeche, ob angemeldet und ob alles eingerichtet ist. */
 async function session(request, env) {
   const quelle = await passwortQuelle(env);
+  const mailConfig = await getMailConfig(env);
   return jsonResponse({
     angemeldet: quelle === 'keins' ? false : await isAuthenticated(request, env),
     einrichtungNoetig: quelle === 'keins' && Boolean(env.SITE_KV),
@@ -148,7 +150,7 @@ async function session(request, env) {
     eingerichtet: {
       passwort: quelle !== 'keins',
       kv: Boolean(env.SITE_KV),
-      mail: Boolean(env.RESEND_API_KEY && env.CONTACT_FROM),
+      mail: Boolean(mailConfig.apiKey && mailConfig.from),
       turnstile: Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY),
     },
   });
@@ -230,6 +232,97 @@ async function anfragen(request, env) {
   });
 }
 
+/** Einstellungen fuer den Mailversand lesen und speichern. */
+async function mail(request, env) {
+  const abgelehnt = await requireAdmin(request, env);
+  if (abgelehnt) return abgelehnt;
+
+  const config = await getMailConfig(env);
+
+  if (request.method === 'GET') {
+    return jsonResponse({
+      // Der Schluessel selbst wird nie zurueckgegeben.
+      apiKeyGesetzt: Boolean(config.apiKey),
+      from: config.from,
+      to: config.to,
+      bestaetigung: config.bestaetigung,
+      quelle: config.quelle,
+      ausUmgebung: {
+        apiKey: Boolean(env.RESEND_API_KEY),
+        from: Boolean(env.CONTACT_FROM),
+        to: Boolean(env.CONTACT_TO),
+      },
+    });
+  }
+
+  if (!sameOrigin(request)) return jsonResponse({ error: 'Ungültige Anfrage.' }, { status: 403 });
+
+  let eingabe;
+  try {
+    eingabe = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Ungültige Daten.' }, { status: 400 });
+  }
+
+  const fehler = await saveMailConfig(env, eingabe);
+  if (fehler) return jsonResponse({ error: fehler }, { status: 400 });
+
+  const neu = await getMailConfig(env);
+  return jsonResponse({
+    ok: true,
+    apiKeyGesetzt: Boolean(neu.apiKey),
+    from: neu.from,
+    to: neu.to,
+    bestaetigung: neu.bestaetigung,
+  });
+}
+
+/** Testmail an die hinterlegte Adresse schicken. */
+async function mailtest(request, env) {
+  const abgelehnt = await requireAdmin(request, env);
+  if (abgelehnt) return abgelehnt;
+  if (!sameOrigin(request)) return jsonResponse({ error: 'Ungültige Anfrage.' }, { status: 403 });
+
+  const config = await getMailConfig(env);
+  const content = await getContent(env);
+  const empfaenger = config.to || content.kontakt.email;
+
+  if (!config.apiKey || !config.from) {
+    return jsonResponse(
+      { error: 'Bitte zuerst Schlüssel und Absenderadresse eintragen und speichern.' },
+      { status: 400 }
+    );
+  }
+  if (!empfaenger) {
+    return jsonResponse(
+      { error: 'Es ist keine Empfängeradresse hinterlegt – weder hier noch unter „Kontakt".' },
+      { status: 400 }
+    );
+  }
+
+  const versand = await sendMail(env, {
+    to: empfaenger,
+    subject: 'Testmail von deiner Website',
+    text:
+      'Diese Nachricht kommt aus dem Admin-Bereich deiner Website.\n\n' +
+      'Wenn du sie liest, funktioniert der Mailversand – Anfragen aus dem Kontaktformular ' +
+      'landen ab jetzt in diesem Postfach.',
+    html:
+      '<p style="font-family:system-ui,sans-serif;font-size:16px;line-height:1.6">' +
+      'Diese Nachricht kommt aus dem Admin-Bereich deiner Website.<br><br>' +
+      'Wenn du sie liest, funktioniert der Mailversand – Anfragen aus dem Kontaktformular ' +
+      'landen ab jetzt in diesem Postfach.</p>',
+  });
+
+  if (!versand.ok) {
+    return jsonResponse(
+      { error: versand.error || 'Der Versand hat nicht geklappt.', empfaenger },
+      { status: 502 }
+    );
+  }
+  return jsonResponse({ ok: true, empfaenger });
+}
+
 const ROUTEN = {
   login: { POST: login },
   einrichten: { POST: einrichten },
@@ -237,6 +330,8 @@ const ROUTEN = {
   logout: { POST: () => jsonResponse({ ok: true }, { headers: { 'Set-Cookie': clearSessionCookie() } }) },
   session: { GET: session },
   content: { GET: content, PUT: content, DELETE: content },
+  mail: { GET: mail, POST: mail },
+  mailtest: { POST: mailtest },
   anfragen: { GET: anfragen, DELETE: anfragen },
 };
 
