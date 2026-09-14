@@ -39,27 +39,39 @@ Lokal wird ein simulierter KV-Speicher unter `.wrangler/` genutzt – die echten
    | Feld | Wert |
    | --- | --- |
    | Project name | `hundeschule` (muss mit `name` in `wrangler.toml` übereinstimmen) |
-   | Build command | *(leer lassen)* |
+   | Build command | `node scripts/prepare-kv.mjs` |
    | Deploy command | `npx wrangler deploy` |
 
-   Es gibt bewusst keinen Build-Schritt: `wrangler deploy` lädt `public/` als statische Assets hoch
-   und `src/worker.js` als Worker-Code.
+   Einen echten Build-Schritt gibt es nicht: `wrangler deploy` lädt `public/` als statische Assets
+   hoch und `src/worker.js` als Worker-Code. Das Build command verbindet nur den Speicher
+   (siehe 2.2).
 3. Cloudflare baut aus dem **Standard-Branch** des Repositories (`main`). Der Branch lässt sich
    nachträglich unter **Settings → Builds** ändern.
 
-### 2.2 Speicher (KV) anlegen und eintragen
+### 2.2 Speicher (KV)
 
 Ohne KV läuft die Seite mit den Standardinhalten, aber **Speichern im Admin-Bereich ist dann nicht
-möglich** und Anfragen werden nicht zwischengespeichert.
+möglich** und Formularanfragen werden nicht zwischengespeichert.
 
-1. **Storage & Databases → KV → Create namespace**, Name z. B. `hundeschule-inhalte`.
-2. Die **Namespace-ID** kopieren (im Dashboard beim Namespace unter **Settings**, oder aus der
-   Adresszeile – eine 32-stellige Zeichenfolge).
-3. Diese ID in `wrangler.toml` bei `[[kv_namespaces]]` → `id` eintragen und committen.
+Das übernimmt `scripts/prepare-kv.mjs` als Build command: Es sucht vor jedem Deploy einen
+KV-Namespace namens `hundeschule-inhalte`, legt ihn an, falls es ihn noch nicht gibt, und trägt ihn
+in `wrangler.toml` ein. Es bricht den Build nie ab – klappt etwas nicht, wird die Website ohne
+Speicher ausgeliefert und im Admin-Bereich steht unter „System", dass er fehlt.
 
-> ⚠️ Anders als bei Pages ist `wrangler.toml` beim Git-Deployment die maßgebliche Quelle:
-> Bindings, die nur im Dashboard gesetzt sind, werden bei jedem Deploy überschrieben. Der
-> KV-Namespace muss deshalb in der Datei stehen, nicht im Dashboard.
+> ⚠️ Warum nicht einfach im Dashboard binden? Beim Git-Deployment ist `wrangler.toml` die
+> maßgebliche Quelle. Bindings, die nur im Dashboard gesetzt sind, werden bei jedem Deploy
+> überschrieben. Secrets sind davon **nicht** betroffen.
+
+Wer es lieber fest verdrahtet, trägt die Namespace-ID (Dashboard → Storage & Databases → KV →
+Namespace → **Settings**) direkt in `wrangler.toml` ein:
+
+```toml
+[[kv_namespaces]]
+binding = "SITE_KV"
+id = "…"
+```
+
+Dann lässt das Skript die Datei unangetastet, und das Build command kann leer bleiben.
 
 ### 2.3 Secrets setzen
 
@@ -155,7 +167,8 @@ src/
   render/               layout.js (Kopf/Fuß/Cookie) und pages.js (die einzelnen Seiten)
 
 scripts/check.mjs       Tests (npm run check)
-wrangler.toml           Worker-Konfiguration inkl. KV-Binding
+scripts/prepare-kv.mjs  verbindet den KV-Speicher beim Deploy automatisch
+wrangler.toml           Worker-Konfiguration
 ```
 
 **Routing:** Cloudflare prüft zuerst, ob eine statische Datei zum Pfad passt (`/assets/…`,

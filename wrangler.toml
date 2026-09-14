@@ -1,10 +1,9 @@
 # Cloudflare Worker – Konfiguration
 #
-# Diese Datei ist die Wahrheit für das Deployment: Cloudflare liest sie bei
-# jedem Build aus dem Repository. Bindings, die nur im Dashboard gesetzt sind,
-# werden dabei überschrieben – der KV-Namespace muss deshalb hier stehen.
-# Secrets (ADMIN_PASSWORD, SESSION_SECRET, RESEND_API_KEY …) bleiben davon
-# unberührt und werden weiterhin im Dashboard gesetzt.
+# Diese Datei ist beim Git-Deployment die maßgebliche Quelle: Cloudflare liest
+# sie bei jedem Build aus dem Repository. Secrets (ADMIN_PASSWORD,
+# SESSION_SECRET, RESEND_API_KEY …) bleiben davon unberührt und werden
+# weiterhin im Dashboard gesetzt.
 
 name = "hundeschule"
 main = "src/worker.js"
@@ -18,8 +17,22 @@ keep_vars = true
 [assets]
 directory = "./public"
 
+# ───────────────────────────────────────────────────────────────────────────
 # Speicher für Inhalte (Preise, Termine, Kontaktdaten) und Formularanfragen.
-# Die id steht im Dashboard unter Storage & Databases → KV → hundeschule-inhalte.
-[[kv_namespaces]]
-binding = "SITE_KV"
-id = "HIER_KV_NAMESPACE_ID_EINTRAGEN" # lokal egal, wird nur beim echten Deploy gebraucht
+#
+# Das Binding steht hier bewusst nicht fest drin: scripts/prepare-kv.mjs sucht
+# den KV-Namespace beim Deploy und trägt ihn automatisch ein. Dafür muss im
+# Cloudflare-Dashboard unter Settings → Builds als Build command stehen:
+#
+#     node scripts/prepare-kv.mjs
+#
+# Wer es lieber fest verdrahtet, trägt die Namespace-ID hier ein – dann lässt
+# das Skript die Datei unangetastet:
+#
+# [[kv_namespaces]]
+# binding = "SITE_KV"
+# id = "HIER_DIE_NAMESPACE_ID_EINTRAGEN"
+#
+# Ohne beides läuft die Website mit den Standardinhalten aus
+# src/data/defaults.js; der Admin-Bereich kann dann nichts speichern.
+# ───────────────────────────────────────────────────────────────────────────

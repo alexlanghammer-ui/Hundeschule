@@ -89,7 +89,7 @@
   /* ------------------------------------------------------------ Änderungen */
   function markiereGeaendert() {
     state.dirty = true;
-    el('saveBtn').disabled = false;
+    if (!state.setup || state.setup.kv) el('saveBtn').disabled = false;
     var s = el('saveState');
     s.textContent = 'Nicht gespeichert';
     s.className = 'save-state is-dirty';
@@ -442,7 +442,12 @@
       'Session-Schlüssel',
       'Secret SESSION_SECRET. Fehlt es, wird ersatzweise das Passwort zum Signieren genutzt – dann werden alle Sitzungen ungültig, sobald das Passwort geändert wird.',
     ],
-    kv: ['Speicher (KV)', 'Binding SITE_KV – speichert Inhalte und eingegangene Anfragen.'],
+    kv: [
+      'Speicher (KV)',
+      'Speichert Inhalte und eingegangene Anfragen. Fehlt er, läuft die Website mit den ' +
+        'Standardinhalten weiter, Änderungen hier lassen sich aber nicht sichern. ' +
+        'Einrichtung: KV-Namespace-ID in wrangler.toml eintragen (siehe README, Abschnitt 2.2).',
+    ],
     mail: ['Mailversand', 'RESEND_API_KEY und CONTACT_FROM – ohne diese landen Anfragen nur unter „Anfragen“.'],
     turnstile: ['Spamschutz Turnstile', 'TURNSTILE_SITE_KEY und TURNSTILE_SECRET_KEY (optional).'],
   };
@@ -462,13 +467,17 @@
       ziel.appendChild(item);
     });
 
-    var fehlend = [];
-    if (!setup.kv) fehlend.push('der Speicher (KV-Binding SITE_KV)');
-    if (!setup.mail) fehlend.push('der Mailversand (RESEND_API_KEY, CONTACT_FROM)');
     var warnung = el('setupWarning');
-    if (fehlend.length) {
+    if (!setup.kv) {
+      // Ohne Speicher geht gar nichts – das ist die wichtigere Meldung.
       warnung.textContent =
-        'Noch nicht eingerichtet: ' + fehlend.join(' und ') + '. Details im Reiter „System“.';
+        'Der Speicher ist noch nicht verbunden. Die Website läuft, aber Änderungen hier ' +
+        'lassen sich noch nicht speichern. Was zu tun ist, steht im Reiter „System“.';
+      warnung.hidden = false;
+    } else if (!setup.mail) {
+      warnung.textContent =
+        'Der Mailversand ist noch nicht eingerichtet. Anfragen aus dem Formular werden ' +
+        'gespeichert und erscheinen im Reiter „Anfragen“, kommen aber noch nicht per E-Mail an.';
       warnung.hidden = false;
     } else {
       warnung.hidden = true;

@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev --port 8788",
-    "deploy": "wrangler deploy",
-    "check": "node scripts/check.mjs"
+    "deploy": "node scripts/prepare-kv.mjs && wrangler deploy",
+    "check": "node scripts/check.mjs",
+    "prepare-kv": "node scripts/prepare-kv.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.42.0"

@@ -160,7 +160,10 @@ export async function getContent(env) {
 /** Inhalt speichern. Gibt den bereinigten Datensatz zurueck. */
 export async function putContent(env, input) {
   if (!env || !env.SITE_KV) {
-    throw new Error('KV-Namespace SITE_KV ist nicht gebunden – Speichern nicht möglich.');
+    throw new Error(
+      'Der Speicher ist noch nicht verbunden – Speichern ist deshalb nicht möglich. ' +
+        'Details stehen im Reiter „System".'
+    );
   }
   const clean = sanitize(input);
   clean.updatedAt = new Date().toISOString();
