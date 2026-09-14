@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  var state = { content: null, dirty: false, setup: null };
+  var state = { content: null, dirty: false, setup: null, passwortQuelle: null };
 
   var el = function (id) { return document.getElementById(id); };
 
@@ -41,11 +41,46 @@
   function zeigeLogin(fehler) {
     el('appView').hidden = true;
     el('loginView').hidden = false;
+    el('setupForm').hidden = true;
+    el('loginForm').hidden = false;
     var box = el('loginError');
     box.textContent = fehler || '';
     box.hidden = !fehler;
     el('password').focus();
   }
+
+  /** Erstes Mal: Passwort selbst vergeben. */
+  function zeigeEinrichtung(fehler) {
+    el('appView').hidden = true;
+    el('loginView').hidden = false;
+    el('loginForm').hidden = true;
+    el('setupForm').hidden = false;
+    var box = el('setupError');
+    box.textContent = fehler || '';
+    box.hidden = !fehler;
+    el('setupPassword').focus();
+  }
+
+  el('setupForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = el('setupSubmit');
+    var pw = el('setupPassword').value;
+    var wdh = el('setupRepeat').value;
+    if (pw !== wdh) { zeigeEinrichtung('Die beiden Passwörter stimmen nicht überein.'); return; }
+    btn.disabled = true;
+    api('/api/admin/einrichten', {
+      method: 'POST',
+      body: JSON.stringify({ passwort: pw, wiederholung: wdh }),
+    })
+      .then(function () {
+        el('setupPassword').value = '';
+        el('setupRepeat').value = '';
+        el('setupError').hidden = true;
+        start();
+      })
+      .catch(function (err) { zeigeEinrichtung(err.message); })
+      .then(function () { btn.disabled = false; });
+  });
 
   el('loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -435,24 +470,58 @@
 
   el('anfragenReload').addEventListener('click', ladeAnfragen);
 
+  /* ------------------------------------------------------------ Passwort */
+  el('passwortForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = el('pwSubmit');
+    el('pwOk').hidden = true;
+    el('pwError').hidden = true;
+    if (el('pwNeu').value !== el('pwWdh').value) {
+      el('pwError').textContent = 'Die beiden neuen Passwörter stimmen nicht überein.';
+      el('pwError').hidden = false;
+      return;
+    }
+    btn.disabled = true;
+    api('/api/admin/passwort', {
+      method: 'POST',
+      body: JSON.stringify({
+        aktuell: el('pwAktuell').value,
+        neu: el('pwNeu').value,
+        wiederholung: el('pwWdh').value,
+      }),
+    })
+      .then(function () {
+        el('passwortForm').reset();
+        el('pwOk').textContent = 'Passwort geändert. Beim nächsten Anmelden gilt das neue.';
+        el('pwOk').hidden = false;
+      })
+      .catch(function (err) {
+        el('pwError').textContent = err.message;
+        el('pwError').hidden = false;
+      })
+      .then(function () { btn.disabled = false; });
+  });
+
   /* ----------------------------------------------------------------- System */
   var STATUS_TEXTE = {
-    passwort: ['Admin-Passwort', 'Secret ADMIN_PASSWORD – ohne dieses ist keine Anmeldung möglich.'],
-    sessionSecret: [
-      'Session-Schlüssel',
-      'Secret SESSION_SECRET. Fehlt es, wird ersatzweise das Passwort zum Signieren genutzt – dann werden alle Sitzungen ungültig, sobald das Passwort geändert wird.',
-    ],
+    passwort: ['Admin-Passwort', 'Ohne Passwort ist keine Anmeldung möglich.'],
     kv: [
       'Speicher (KV)',
-      'Speichert Inhalte und eingegangene Anfragen. Fehlt er, läuft die Website mit den ' +
-        'Standardinhalten weiter, Änderungen hier lassen sich aber nicht sichern. ' +
-        'Einrichtung: KV-Namespace-ID in wrangler.toml eintragen (siehe README, Abschnitt 2.2).',
+      'Speichert Inhalte, Passwort und eingegangene Anfragen. Fehlt er, läuft die Website mit ' +
+        'den Standardinhalten weiter, Änderungen hier lassen sich aber nicht sichern.',
     ],
-    mail: ['Mailversand', 'RESEND_API_KEY und CONTACT_FROM – ohne diese landen Anfragen nur unter „Anfragen“.'],
+    mail: [
+      'Mailversand',
+      'RESEND_API_KEY und CONTACT_FROM im Cloudflare-Dashboard. Ohne diese landen Anfragen ' +
+        'nur unter „Anfragen“.',
+    ],
     turnstile: ['Spamschutz Turnstile', 'TURNSTILE_SITE_KEY und TURNSTILE_SECRET_KEY (optional).'],
   };
 
   function baueStatus(setup) {
+    // Aus dem Secret stammende Passwörter lassen sich hier nicht ändern.
+    el('passwortForm').hidden = state.passwortQuelle === 'secret';
+
     var ziel = el('statusListe');
     ziel.innerHTML = '';
     Object.keys(STATUS_TEXTE).forEach(function (key) {
@@ -489,9 +558,14 @@
     api('/api/admin/session')
       .then(function (sitzung) {
         state.setup = sitzung.eingerichtet;
+        state.passwortQuelle = sitzung.passwortQuelle;
+
+        if (sitzung.einrichtungNoetig) { zeigeEinrichtung(''); return; }
+
         if (!sitzung.eingerichtet.passwort) {
           zeigeLogin(
-            'Der Admin-Bereich ist noch nicht eingerichtet: Bitte das Secret ADMIN_PASSWORD im Cloudflare-Dashboard setzen.'
+            'Es ist noch kein Passwort vergeben und der Speicher ist nicht verbunden. ' +
+              'Ohne Speicher lässt sich keines festlegen.'
           );
           return;
         }

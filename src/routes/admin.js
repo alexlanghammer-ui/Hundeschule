@@ -4,25 +4,27 @@ import {
   clearSessionCookie,
   clientIp,
   createSessionCookie,
+  einrichtungMoeglich,
   isAuthenticated,
   jsonResponse,
+  MIN_PASSWORT_LAENGE,
+  passwortQuelle,
+  pruefePasswort,
   rateLimit,
   requireAdmin,
-  safeEqual,
   sameOrigin,
+  setzePasswort,
 } from '../lib/auth.js';
 import { DEFAULTS, getContent, putContent } from '../lib/content.js';
 
 const PRAEFIX = 'anfrage:';
 
 async function login(request, env) {
-  if (!env.ADMIN_PASSWORD) {
+  if ((await passwortQuelle(env)) === 'keins') {
     return jsonResponse(
       {
-        error:
-          'Der Admin-Bereich ist noch nicht eingerichtet. Bitte im Cloudflare-Dashboard unter ' +
-          'Settings → Variables and Secrets das Secret ADMIN_PASSWORD setzen. Ist es dort schon ' +
-          'gesetzt, läuft noch eine ältere Version: einmal neu deployen, dann greift es.',
+        error: 'Es ist noch kein Passwort vergeben. Bitte lege zuerst eines fest.',
+        einrichtungNoetig: true,
       },
       { status: 503 }
     );
@@ -47,20 +49,104 @@ async function login(request, env) {
     return jsonResponse({ error: 'Ungültige Anfrage.' }, { status: 400 });
   }
 
-  if (!(await safeEqual(password, env.ADMIN_PASSWORD))) {
+  if (!(await pruefePasswort(env, password))) {
     return jsonResponse({ error: 'Passwort stimmt nicht.' }, { status: 401 });
   }
 
   return jsonResponse({ ok: true }, { headers: { 'Set-Cookie': await createSessionCookie(env) } });
 }
 
+/**
+ * Erstmalige Vergabe des Passworts – nur moeglich, solange noch keines
+ * existiert. Danach antwortet der Endpunkt dauerhaft mit 403.
+ */
+async function einrichten(request, env) {
+  if (!sameOrigin(request)) {
+    return jsonResponse({ error: 'Ungültige Anfrage.' }, { status: 403 });
+  }
+  if (!(await einrichtungMoeglich(env))) {
+    return jsonResponse(
+      { error: 'Es ist bereits ein Passwort vergeben. Bitte melde dich an.' },
+      { status: 403 }
+    );
+  }
+
+  let passwort = '';
+  let wiederholung = '';
+  try {
+    const body = await request.json();
+    passwort = String(body.passwort || '');
+    wiederholung = String(body.wiederholung || '');
+  } catch {
+    return jsonResponse({ error: 'Ungültige Anfrage.' }, { status: 400 });
+  }
+
+  if (passwort !== wiederholung) {
+    return jsonResponse({ error: 'Die beiden Passwörter stimmen nicht überein.' }, { status: 400 });
+  }
+
+  const fehler = await setzePasswort(env, passwort);
+  if (fehler) return jsonResponse({ error: fehler }, { status: 400 });
+
+  return jsonResponse({ ok: true }, { headers: { 'Set-Cookie': await createSessionCookie(env) } });
+}
+
+/** Passwort aendern – nur angemeldet und nur mit dem bisherigen Passwort. */
+async function passwortAendern(request, env) {
+  const abgelehnt = await requireAdmin(request, env);
+  if (abgelehnt) return abgelehnt;
+  if (!sameOrigin(request)) {
+    return jsonResponse({ error: 'Ungültige Anfrage.' }, { status: 403 });
+  }
+  if ((await passwortQuelle(env)) === 'secret') {
+    return jsonResponse(
+      {
+        error:
+          'Das Passwort stammt aus dem Secret ADMIN_PASSWORD und lässt sich nur im ' +
+          'Cloudflare-Dashboard ändern.',
+      },
+      { status: 409 }
+    );
+  }
+
+  let aktuell = '';
+  let neu = '';
+  let wiederholung = '';
+  try {
+    const body = await request.json();
+    aktuell = String(body.aktuell || '');
+    neu = String(body.neu || '');
+    wiederholung = String(body.wiederholung || '');
+  } catch {
+    return jsonResponse({ error: 'Ungültige Anfrage.' }, { status: 400 });
+  }
+
+  if (!(await pruefePasswort(env, aktuell))) {
+    return jsonResponse({ error: 'Das bisherige Passwort stimmt nicht.' }, { status: 401 });
+  }
+  if (neu !== wiederholung) {
+    return jsonResponse({ error: 'Die beiden neuen Passwörter stimmen nicht überein.' }, { status: 400 });
+  }
+
+  const fehler = await setzePasswort(env, neu);
+  if (fehler) return jsonResponse({ error: fehler }, { status: 400 });
+
+  return jsonResponse(
+    { ok: true },
+    { headers: { 'Set-Cookie': await createSessionCookie(env) } }
+  );
+}
+
 /** Sagt der Admin-Oberflaeche, ob angemeldet und ob alles eingerichtet ist. */
 async function session(request, env) {
+  const quelle = await passwortQuelle(env);
   return jsonResponse({
-    angemeldet: env.ADMIN_PASSWORD ? await isAuthenticated(request, env) : false,
+    angemeldet: quelle === 'keins' ? false : await isAuthenticated(request, env),
+    einrichtungNoetig: quelle === 'keins' && Boolean(env.SITE_KV),
+    passwortQuelle: quelle,
+    minPasswortLaenge: MIN_PASSWORT_LAENGE,
     eingerichtet: {
-      passwort: Boolean(env.ADMIN_PASSWORD),
-      sessionSecret: Boolean(env.SESSION_SECRET),
+      passwort: quelle !== 'keins',
       kv: Boolean(env.SITE_KV),
       mail: Boolean(env.RESEND_API_KEY && env.CONTACT_FROM),
       turnstile: Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY),
@@ -146,6 +232,8 @@ async function anfragen(request, env) {
 
 const ROUTEN = {
   login: { POST: login },
+  einrichten: { POST: einrichten },
+  passwort: { POST: passwortAendern },
   logout: { POST: () => jsonResponse({ ok: true }, { headers: { 'Set-Cookie': clearSessionCookie() } }) },
   session: { GET: session },
   content: { GET: content, PUT: content, DELETE: content },

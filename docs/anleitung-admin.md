@@ -2,14 +2,29 @@
 
 Diese Anleitung ist für die tägliche Pflege gedacht – ohne Technik.
 
-## Anmelden
+## Das allererste Mal: Passwort festlegen
 
 1. Im Browser die Adresse der Website aufrufen und **/admin** anhängen,
    also zum Beispiel `https://4steps4dogs.de/admin`.
-2. Passwort eingeben und auf **Anmelden** klicken.
+2. Beim allerersten Mal erscheint ein Bildschirm **„Willkommen"**. Dort legst du dein Passwort
+   selbst fest — zweimal eintippen, dann auf **Passwort festlegen**.
+3. Fertig, du bist direkt drin.
+
+Das Passwort muss mindestens 8 Zeichen haben. Merk es dir gut: Es steht nirgends sonst.
+
+> **Gleich nach dem Livegang erledigen.** Der Willkommens-Bildschirm erscheint nur, solange noch
+> kein Passwort vergeben ist — theoretisch könnte sonst jemand anderes, der die Adresse kennt,
+> zuerst eines setzen. Sobald deines steht, ist die Tür zu.
+
+## Später: Anmelden
+
+Wieder `/admin` aufrufen, Passwort eingeben, **Anmelden**.
 
 Die Anmeldung gilt 8 Stunden. Danach – oder nach einem Klick auf **Abmelden** – ist eine neue
 Anmeldung nötig. Am Handy funktioniert alles genauso wie am Rechner.
+
+**Passwort ändern:** im Reiter **System**, Abschnitt „Passwort ändern". Du brauchst dafür das
+bisherige Passwort.
 
 ## Die wichtigste Regel
 
@@ -110,16 +125,21 @@ Zeigt mit grünem oder orangem Punkt, was eingerichtet ist: Passwort, Speicher, 
 Spamschutz. Orange bedeutet nicht, dass die Website kaputt ist – nur dass diese eine Funktion noch
 fehlt. Die technische Einrichtung ist in der `README.md` beschrieben.
 
-Ganz unten steht **Inhalte zurücksetzen**. Das stellt *alle* Texte, Preise und Kurse auf den
-Auslieferungszustand zurück. Eingegangene Anfragen bleiben erhalten. Bitte nur im Notfall benutzen.
+Hier findest du außerdem **Passwort ändern** (bisheriges Passwort eingeben, neues zweimal).
 
----
+Ganz unten steht **Inhalte zurücksetzen**. Das stellt *alle* Texte, Preise und Kurse auf den
+Auslieferungszustand zurück. Eingegangene Anfragen und dein Passwort bleiben erhalten.
+Bitte nur im Notfall benutzen.
 
 ## Wenn etwas nicht klappt
 
-* **„Passwort stimmt nicht“** – auf Groß- und Kleinschreibung achten. Nach 10 Fehlversuchen ist die
+* **„Passwort stimmt nicht"** – auf Groß- und Kleinschreibung achten. Nach 10 Fehlversuchen ist die
   Anmeldung 15 Minuten gesperrt.
-* **Änderung nicht sichtbar** – wurde auf **Speichern** geklickt? Steht grün „Gespeichert“?
+* **Passwort vergessen** – es lässt sich nicht auslesen, nur zurücksetzen. Dafür muss jemand mit
+  Cloudflare-Zugang im Speicher (KV → `hundeschule-inhalte`) den Eintrag `admin:passwort` löschen.
+  Danach erscheint beim nächsten Aufruf von `/admin` wieder der Willkommens-Bildschirm und du
+  vergibst ein neues. Deine Inhalte bleiben dabei unberührt.
+* **Änderung nicht sichtbar** – wurde auf **Speichern** geklickt? Steht grün „Gespeichert"?
   Dann eine Minute warten und die Seite neu laden.
 * **Seite fragt plötzlich wieder nach dem Passwort** – die 8 Stunden sind abgelaufen. Einfach neu
   anmelden. Wichtig: Noch nicht gespeicherte Änderungen gehen dabei verloren, deshalb

@@ -1,6 +1,8 @@
 # Kopie als .dev.vars anlegen (wird nicht eingecheckt) – nur fuer `npm run dev`.
-ADMIN_PASSWORD="bitte-aendern"
-SESSION_SECRET="langer-zufaelliger-string"
+# Beide optional: ohne sie wird das Passwort beim ersten Aufruf von /admin
+# selbst vergeben und im lokalen KV abgelegt.
+ADMIN_PASSWORD=""
+SESSION_SECRET=""
 SITE_URL="http://localhost:8788"
 
 # Mailversand (optional, ohne diese Werte landen Anfragen nur im Admin-Bereich)

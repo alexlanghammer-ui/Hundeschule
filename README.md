@@ -73,26 +73,43 @@ id = "…"
 
 Dann lässt das Skript die Datei unangetastet, und das Build command kann leer bleiben.
 
-### 2.3 Secrets setzen
+### 2.3 Passwort für den Admin-Bereich
 
-**Settings → Variables and Secrets.** Secrets bleiben beim Deploy erhalten und werden nicht von
-`wrangler.toml` überschrieben.
+**Es ist nichts einzurichten.** Beim ersten Aufruf von `/admin` erscheint ein Bildschirm
+„Willkommen", auf dem das Passwort selbst vergeben wird. Es landet als PBKDF2-Hash im KV und
+übersteht damit jeden Deploy. Ändern lässt es sich später im Admin-Bereich unter **System**.
 
-| Name | Typ | Pflicht | Bedeutung |
-| --- | --- | --- | --- |
-| `ADMIN_PASSWORD` | Secret | ja | Passwort für `/admin`. Ohne das ist der Admin-Bereich gesperrt. |
-| `SESSION_SECRET` | Secret | ja | Langer Zufallsstring zum Signieren der Anmeldung. Erzeugen z. B. mit `openssl rand -base64 32`. |
-| `SITE_URL` | Text | nein | Öffentliche Adresse ohne Schrägstrich am Ende. Fehlt sie, wird die Adresse des Aufrufs verwendet – nötig erst bei eigener Domain. |
-| `RESEND_API_KEY` | Secret | für Mailversand | API-Key aus Resend. |
-| `CONTACT_FROM` | Text | für Mailversand | Absender, z. B. `Hundeschule <anfrage@4steps4dogs.de>`. Die Domain muss in Resend verifiziert sein. |
-| `CONTACT_TO` | Text | optional | Empfängeradresse. Leer lassen = die im Admin-Bereich gepflegte E-Mail-Adresse. |
-| `SEND_CONFIRMATION` | Text | optional | `false` schaltet die automatische Eingangsbestätigung an Anfragende ab. |
-| `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | Text / Secret | optional | Zusätzlicher Spamschutz, siehe unten. |
+> ⚠️ **Warum nicht als Secret?** Bei Git-gekoppelten Workers ist `wrangler.toml` die maßgebliche
+> Quelle. Jeder Deploy erzeugt eine neue Version, und im Dashboard gesetzte Secrets gehören zu
+> einer Version, die dabei überholt wird – das Passwort war nach jedem Build wieder weg. Ein im
+> KV hinterlegtes Passwort hat dieses Problem nicht.
 
-> ⚠️ **Secrets greifen erst nach einem neuen Deployment.** Die laufende Version des Workers
-> kennt nur die Secrets, die es zum Zeitpunkt ihres Deployments gab. Nach dem Anlegen also einen
-> neuen Build anstoßen (Dashboard → **Deployments** → neuesten Build erneut ausführen) oder einen
-> beliebigen Commit pushen – der Git-Build deployt automatisch.
+Der Einrichtungsbildschirm erscheint nur, solange **kein** Passwort existiert; danach antwortet
+der Endpunkt dauerhaft mit 403. Die Seite sollte deshalb direkt nach dem ersten Deploy aufgerufen
+werden.
+
+`ADMIN_PASSWORD` funktioniert weiterhin und hat Vorrang, falls es gesetzt ist – dann entfällt der
+Einrichtungsbildschirm und das Passwort lässt sich nur im Dashboard ändern.
+
+### 2.3b Optionale Variablen
+
+**Settings → Variables and Secrets.** Alle optional; ohne sie läuft die Seite.
+
+| Name | Typ | Bedeutung |
+| --- | --- | --- |
+| `SITE_URL` | Text | Öffentliche Adresse ohne Schrägstrich am Ende. Fehlt sie, wird die Adresse des Aufrufs verwendet – nötig erst bei eigener Domain. |
+| `RESEND_API_KEY` | Secret | API-Key aus Resend, für den Mailversand. |
+| `CONTACT_FROM` | Text | Absender, z. B. `Hundeschule <anfrage@4steps4dogs.de>`. Die Domain muss in Resend verifiziert sein. |
+| `CONTACT_TO` | Text | Empfängeradresse. Leer lassen = die im Admin-Bereich gepflegte E-Mail-Adresse. |
+| `SEND_CONFIRMATION` | Text | `false` schaltet die automatische Eingangsbestätigung an Anfragende ab. |
+| `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | Text / Secret | Zusätzlicher Spamschutz. |
+| `ADMIN_PASSWORD` | Secret | Überschreibt das selbst vergebene Passwort. |
+| `SESSION_SECRET` | Secret | Schlüssel zum Signieren der Anmeldung. Ohne ihn wird einer erzeugt und im KV abgelegt. |
+
+> ⚠️ Auch diese Werte verschwinden bei jedem Deploy wieder, solange sie nur im Dashboard stehen.
+> Dauerhaft gehören Klartext-Werte in `wrangler.toml` unter `[vars]`; echte Geheimnisse
+> (`RESEND_API_KEY`) müssen nach jedem Deploy neu gesetzt oder per
+> `npx wrangler secret put` gepflegt werden.
 
 ### 2.4 Eigene Domain
 

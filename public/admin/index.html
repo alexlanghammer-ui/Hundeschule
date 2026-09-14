@@ -33,6 +33,45 @@
         <div class="alert alert--error" id="loginError" hidden></div>
         <button class="btn btn--dark btn--block" type="submit" id="loginSubmit">Anmelden</button>
       </form>
+
+      <!-- Erstes Mal: Passwort selbst vergeben -->
+      <form class="login__card" id="setupForm" hidden>
+        <span class="login__mark">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <ellipse cx="10" cy="19" rx="5.6" ry="7.4" transform="rotate(-18 10 19)" />
+            <ellipse cx="20" cy="12" rx="5.4" ry="7.6" transform="rotate(-7 20 12)" />
+            <ellipse cx="30.5" cy="12.6" rx="5.4" ry="7.6" transform="rotate(8 30.5 12.6)" />
+            <ellipse cx="39.5" cy="20.5" rx="5.6" ry="7.2" transform="rotate(20 39.5 20.5)" />
+            <path
+              d="M24.4 24c6.6 0 12.4 5.1 12.4 11 0 4.4-3.3 7-7.7 7-2.3 0-3.6-.8-4.7-.8s-2.4.8-4.7.8c-4.4 0-7.9-2.6-7.9-7 0-5.9 6-11 12.6-11Z"
+            />
+          </svg>
+        </span>
+        <h1>Willkommen</h1>
+        <p class="login__hint">
+          Leg jetzt dein Passwort für die Verwaltung fest. Danach kommst du damit jederzeit
+          hier herein.
+        </p>
+        <div class="field">
+          <label for="setupPassword">Neues Passwort</label>
+          <input
+            id="setupPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          />
+          <p class="hint">Mindestens 8 Zeichen.</p>
+        </div>
+        <div class="field">
+          <label for="setupRepeat">Passwort wiederholen</label>
+          <input id="setupRepeat" type="password" autocomplete="new-password" required />
+        </div>
+        <div class="alert alert--error" id="setupError" hidden></div>
+        <button class="btn btn--dark btn--block" type="submit" id="setupSubmit">
+          Passwort festlegen
+        </button>
+      </form>
     </div>
 
     <!-- --------------------------------------------------------------- App -->
@@ -131,6 +170,32 @@
             <p>Was ist eingerichtet, was fehlt noch?</p>
           </div>
           <div id="statusListe" class="status-list"></div>
+
+          <div class="section-head" style="margin-top: 34px">
+            <h2>Passwort ändern</h2>
+            <p>Gilt sofort. Andere angemeldete Geräte bleiben bis zum Ablauf ihrer Sitzung drin.</p>
+          </div>
+          <form class="form-grid" id="passwortForm" style="max-width: 720px">
+            <div class="field">
+              <label for="pwAktuell">Bisheriges Passwort</label>
+              <input id="pwAktuell" type="password" autocomplete="current-password" required />
+            </div>
+            <div class="field">
+              <label for="pwNeu">Neues Passwort</label>
+              <input id="pwNeu" type="password" autocomplete="new-password" minlength="8" required />
+            </div>
+            <div class="field">
+              <label for="pwWdh">Neues Passwort wiederholen</label>
+              <input id="pwWdh" type="password" autocomplete="new-password" required />
+            </div>
+            <div class="field" style="justify-content: flex-end">
+              <button class="btn btn--dark btn--sm" type="submit" id="pwSubmit">
+                Passwort ändern
+              </button>
+            </div>
+          </form>
+          <div class="alert alert--ok" id="pwOk" hidden></div>
+          <div class="alert alert--error" id="pwError" hidden></div>
 
           <div class="section-head" style="margin-top: 34px">
             <h2>Zurücksetzen</h2>

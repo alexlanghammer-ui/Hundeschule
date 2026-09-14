@@ -1,13 +1,37 @@
 /**
  * Login und Session fuer den Admin-Bereich.
  *
- * Es gibt keine Benutzerverwaltung: ein Passwort (Secret ADMIN_PASSWORD) und
- * ein signiertes Session-Cookie. Signiert wird mit HMAC-SHA256 und dem Secret
- * SESSION_SECRET.
+ * Es gibt keine Benutzerverwaltung: ein Passwort und ein signiertes
+ * Session-Cookie (HMAC-SHA256).
+ *
+ * Das Passwort kann aus zwei Quellen kommen:
+ *   1. Secret ADMIN_PASSWORD – hat Vorrang, falls gesetzt.
+ *   2. Im KV hinterlegt – wird beim ersten Aufruf von /admin selbst vergeben.
+ *
+ * Weg 2 ist der Normalfall: Bei Git-gekoppelten Workers überschreibt jeder
+ * Deploy die im Dashboard gesetzten Secrets, weil wrangler.toml die
+ * maßgebliche Quelle ist. Ein im KV hinterlegtes Passwort übersteht dagegen
+ * jeden Deploy.
  */
 
 const COOKIE_NAME = 'hs_admin';
 const SESSION_MAX_AGE = 60 * 60 * 8; // 8 Stunden
+const PASSWORT_KEY = 'admin:passwort';
+const SESSION_SECRET_KEY = 'admin:session-secret';
+const MIN_PASSWORT_LAENGE = 8;
+/**
+ * Durchläufe der Passwort-Ableitung. Bewusst niedrig gehalten: Cloudflare
+ * erlaubt im Gratis-Tarif 10 ms Rechenzeit pro Aufruf, 20.000 Durchläufe
+ * brauchen allein schon ~13 ms – die Anmeldung würde abgebrochen. 5.000
+ * liegen bei ~3 ms.
+ *
+ * Vertretbar, weil der Hash den Worker nie verlässt (er liegt im privaten
+ * KV-Speicher) und Rateversuche ohnehin auf 10 pro 15 Minuten und
+ * IP-Adresse begrenzt sind. Die Zahl wird bei jedem Passwort mitgespeichert
+ * und lässt sich später anheben, ohne bestehende Passwörter zu entwerten.
+ */
+const PBKDF2_ITERATIONEN = 5000;
+
 const encoder = new TextEncoder();
 
 function b64urlEncode(bytes) {
@@ -37,32 +61,124 @@ async function hmacKey(secret) {
 
 /** Zeitkonstanter Vergleich, damit das Passwort nicht erraten werden kann. */
 export async function safeEqual(a, b) {
-  const ab = encoder.encode(String(a));
-  const bb = encoder.encode(String(b));
   const [ha, hb] = await Promise.all([
-    crypto.subtle.digest('SHA-256', ab),
-    crypto.subtle.digest('SHA-256', bb),
+    crypto.subtle.digest('SHA-256', encoder.encode(String(a))),
+    crypto.subtle.digest('SHA-256', encoder.encode(String(b))),
   ]);
   const x = new Uint8Array(ha);
   const y = new Uint8Array(hb);
-  let diff = ab.length === bb.length ? 0 : 1;
+  let diff = 0;
   for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
   return diff === 0;
 }
 
-function sessionSecret(env) {
-  const secret = env.SESSION_SECRET || env.ADMIN_PASSWORD;
-  if (!secret) throw new Error('SESSION_SECRET (oder ADMIN_PASSWORD) fehlt.');
-  return secret;
+/* ------------------------------------------------------------------ Passwort */
+
+async function ableiten(passwort, salt, iterationen) {
+  const key = await crypto.subtle.importKey('raw', encoder.encode(passwort), 'PBKDF2', false, [
+    'deriveBits',
+  ]);
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: iterationen, hash: 'SHA-256' },
+    key,
+    256
+  );
+  return b64urlEncode(new Uint8Array(bits));
+}
+
+async function ladePasswortEintrag(env) {
+  if (!env.SITE_KV) return null;
+  try {
+    return await env.SITE_KV.get(PASSWORT_KEY, { type: 'json' });
+  } catch (err) {
+    console.error('Passwort konnte nicht gelesen werden:', err && err.message);
+    return null;
+  }
+}
+
+/**
+ * Woher kommt das Passwort?
+ * 'secret' = aus ADMIN_PASSWORD, 'kv' = selbst vergeben, 'keins' = noch offen.
+ */
+export async function passwortQuelle(env) {
+  if (env.ADMIN_PASSWORD) return 'secret';
+  const eintrag = await ladePasswortEintrag(env);
+  return eintrag && eintrag.hash ? 'kv' : 'keins';
+}
+
+/** Darf jetzt ein Passwort vergeben werden? Nur solange es noch keines gibt. */
+export async function einrichtungMoeglich(env) {
+  if (!env.SITE_KV) return false;
+  return (await passwortQuelle(env)) === 'keins';
+}
+
+export async function pruefePasswort(env, eingabe) {
+  if (env.ADMIN_PASSWORD) return safeEqual(eingabe, env.ADMIN_PASSWORD);
+  const eintrag = await ladePasswortEintrag(env);
+  if (!eintrag || !eintrag.hash || !eintrag.salt) return false;
+  const hash = await ableiten(
+    String(eingabe),
+    b64urlDecode(eintrag.salt),
+    eintrag.iterationen || PBKDF2_ITERATIONEN
+  );
+  return safeEqual(hash, eintrag.hash);
+}
+
+/** Passwort im KV hinterlegen. Gibt eine Fehlermeldung zurueck oder null. */
+export async function setzePasswort(env, passwort) {
+  const klartext = String(passwort || '');
+  if (klartext.length < MIN_PASSWORT_LAENGE) {
+    return `Das Passwort muss mindestens ${MIN_PASSWORT_LAENGE} Zeichen lang sein.`;
+  }
+  if (klartext.length > 200) return 'Das Passwort ist zu lang.';
+  if (!env.SITE_KV) return 'Der Speicher ist nicht verbunden – das Passwort kann nicht abgelegt werden.';
+
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const hash = await ableiten(klartext, salt, PBKDF2_ITERATIONEN);
+  await env.SITE_KV.put(
+    PASSWORT_KEY,
+    JSON.stringify({
+      hash,
+      salt: b64urlEncode(salt),
+      iterationen: PBKDF2_ITERATIONEN,
+      gesetztAm: new Date().toISOString(),
+    })
+  );
+  return null;
+}
+
+/* ------------------------------------------------------------------- Session */
+
+/**
+ * Schluessel zum Signieren der Anmeldung. Bevorzugt das Secret SESSION_SECRET;
+ * sonst wird beim ersten Mal einer erzeugt und im KV abgelegt, damit
+ * Anmeldungen einen Deploy überleben.
+ */
+async function sessionSecret(env) {
+  if (env.SESSION_SECRET) return env.SESSION_SECRET;
+
+  if (env.SITE_KV) {
+    try {
+      const vorhanden = await env.SITE_KV.get(SESSION_SECRET_KEY);
+      if (vorhanden) return vorhanden;
+      const neu = b64urlEncode(crypto.getRandomValues(new Uint8Array(32)));
+      await env.SITE_KV.put(SESSION_SECRET_KEY, neu);
+      return neu;
+    } catch (err) {
+      console.error('Session-Schlüssel nicht verfügbar:', err && err.message);
+    }
+  }
+
+  if (env.ADMIN_PASSWORD) return env.ADMIN_PASSWORD;
+  throw new Error('Kein Schlüssel zum Signieren der Anmeldung verfügbar.');
 }
 
 export async function createSessionCookie(env) {
   const payload = { exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE, v: 1 };
   const body = b64urlEncode(encoder.encode(JSON.stringify(payload)));
-  const key = await hmacKey(sessionSecret(env));
+  const key = await hmacKey(await sessionSecret(env));
   const sig = b64urlEncode(await crypto.subtle.sign('HMAC', key, encoder.encode(body)));
-  const token = `${body}.${sig}`;
-  return `${COOKIE_NAME}=${token}; Path=/; Max-Age=${SESSION_MAX_AGE}; HttpOnly; Secure; SameSite=Strict`;
+  return `${COOKIE_NAME}=${body}.${sig}; Path=/; Max-Age=${SESSION_MAX_AGE}; HttpOnly; Secure; SameSite=Strict`;
 }
 
 export function clearSessionCookie() {
@@ -83,13 +199,8 @@ export async function isAuthenticated(request, env) {
   if (!token || !token.includes('.')) return false;
   const [body, sig] = token.split('.');
   try {
-    const key = await hmacKey(sessionSecret(env));
-    const ok = await crypto.subtle.verify(
-      'HMAC',
-      key,
-      b64urlDecode(sig),
-      encoder.encode(body)
-    );
+    const key = await hmacKey(await sessionSecret(env));
+    const ok = await crypto.subtle.verify('HMAC', key, b64urlDecode(sig), encoder.encode(body));
     if (!ok) return false;
     const payload = JSON.parse(new TextDecoder().decode(b64urlDecode(body)));
     return typeof payload.exp === 'number' && payload.exp > Math.floor(Date.now() / 1000);
@@ -97,6 +208,8 @@ export async function isAuthenticated(request, env) {
     return false;
   }
 }
+
+/* --------------------------------------------------------------- Hilfsmittel */
 
 /**
  * Schutz gegen Cross-Site-Requests: schreibende Aufrufe muessen von der
@@ -152,9 +265,9 @@ export function jsonResponse(data, init = {}) {
 
 /** Wache fuer alle /api/admin/* Endpunkte. */
 export async function requireAdmin(request, env) {
-  if (!env.ADMIN_PASSWORD) {
+  if ((await passwortQuelle(env)) === 'keins') {
     return jsonResponse(
-      { error: 'Admin-Bereich ist nicht eingerichtet (Secret ADMIN_PASSWORD fehlt).' },
+      { error: 'Der Admin-Bereich ist noch nicht eingerichtet.', einrichtungNoetig: true },
       { status: 503 }
     );
   }
@@ -164,4 +277,4 @@ export async function requireAdmin(request, env) {
   return null;
 }
 
-export { COOKIE_NAME, SESSION_MAX_AGE };
+export { COOKIE_NAME, SESSION_MAX_AGE, MIN_PASSWORT_LAENGE };

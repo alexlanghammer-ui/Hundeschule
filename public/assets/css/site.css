@@ -109,6 +109,11 @@ img {
   max-width: 100%;
   display: block;
 }
+/* Muss nach allen display-Regeln greifen: sonst überstimmt ein eigenes
+   display (flex, grid …) das hidden-Attribut und das Element bleibt sichtbar. */
+[hidden] {
+  display: none !important;
+}
 a {
   color: var(--link);
   text-decoration: none;

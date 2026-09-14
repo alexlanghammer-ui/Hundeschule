@@ -471,3 +471,8 @@ body.admin .btn {
   opacity: 0.45;
   cursor: default;
 }
+
+.alert--ok {
+  background: var(--chip);
+  color: #2f4a2c;
+}
