@@ -136,7 +136,7 @@ export function sanitize(input) {
           p: strList(b && b.p, LIMITS.text, 20),
         }))
         .filter((b) => b.h || b.p.length)
-        .slice(0, 40),
+        .slice(0, 60),
     };
   }
 

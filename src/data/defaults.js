@@ -7,17 +7,17 @@
  */
 
 export const KONTAKT = {
-  name: 'Alexandra Goller',
-  betrieb: 'Alexandra Goller – Hundetraining',
-  mobil: '+49 176 43198863',
-  festnetz: '+49 7125 3096919',
-  email: 'kontakt@deine-domain.de',
-  strasse: 'Robert-Kempel-Straße 8',
-  plzOrt: '72584 Hülben',
-  navAdresse: 'Kaltentalstraße 30, 72584 Hülben',
-  instagram: 'https://www.instagram.com/4steps4dogs_alexandra_goller/',
-  facebook: '',
-  ustId: 'DE000000000',
+  "name": "Alexandra Goller",
+  "betrieb": "4steps4dogs – Alexandra Goller",
+  "mobil": "+49 176 43198863",
+  "festnetz": "+49 7125 3096919",
+  "email": "alex@4steps4dogs.de",
+  "strasse": "Robert-Kempel-Straße 8",
+  "plzOrt": "72584 Hülben",
+  "navAdresse": "Kaltentalstraße 30, 72584 Hülben",
+  "instagram": "https://www.instagram.com/4steps4dogs_alexandra_goller/",
+  "facebook": "",
+  "ustId": "DE344766215"
 };
 
 export const PREISE = {
@@ -149,168 +149,304 @@ export const GELAENDE = {
  * Rechtstexte. {{mobil}}, {{festnetz}}, {{email}}, {{strasse}}, {{plzOrt}},
  * {{name}}, {{betrieb}} und {{ustId}} werden beim Rendern durch die aktuellen
  * Kontaktdaten ersetzt – so muss eine geaenderte Nummer nur einmal gepflegt werden.
+ *
+ * Inhaltlich uebernommen von der bisherigen Website; Hosting-, Mail- und
+ * Cookie-Abschnitte wurden an die tatsaechliche Technik dieser Seite angepasst.
  */
 export const RECHT = {
-  impressum: {
-    title: 'Impressum',
-    lead: 'Angaben gemäß § 5 DDG',
-    blocks: [
-      { h: 'Anbieterin', p: ['{{betrieb}}', '{{strasse}}', '{{plzOrt}}'] },
+  "impressum": {
+    "title": "Impressum",
+    "lead": "Angaben gemäß § 5 DDG",
+    "blocks": [
       {
-        h: 'Kontakt',
-        p: ['Telefon: {{mobil}}', 'Festnetz: {{festnetz}}', 'E-Mail: {{email}}'],
+        "h": "Anbieterin",
+        "p": [
+          "{{betrieb}}",
+          "{{name}}",
+          "{{strasse}}",
+          "{{plzOrt}}"
+        ]
       },
       {
-        h: 'Erlaubnis',
-        p: [
-          'Erlaubnis gemäß § 11 Abs. 1 Satz 1 Nr. 8f TierSchG, erteilt durch das Landratsamt Reutlingen.',
-          'Mitglied im Internationalen Berufsverband der Hundetrainer & Hundeunternehmer (IBH) e.V.',
-        ],
+        "h": "Kontakt",
+        "p": [
+          "Telefon: {{festnetz}}",
+          "Mobil: {{mobil}}",
+          "E-Mail: {{email}}"
+        ]
       },
       {
-        h: 'Umsatzsteuer',
-        p: ['Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: {{ustId}}'],
-      },
-      { h: 'Verantwortlich für den Inhalt', p: ['{{name}}, Adresse wie oben.'] },
-      {
-        h: 'Haftung für Inhalte',
-        p: [
-          'Die Inhalte dieser Seiten werden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte kann jedoch keine Gewähr übernommen werden.',
-        ],
+        "h": "Umsatzsteuer",
+        "p": [
+          "Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: {{ustId}}"
+        ]
       },
       {
-        h: 'Haftung für Links',
-        p: [
-          'Diese Website enthält Links zu externen Websites Dritter, auf deren Inhalte kein Einfluss besteht. Für diese fremden Inhalte ist stets der jeweilige Anbieter verantwortlich.',
-        ],
+        "h": "Aufsichtsbehörde",
+        "p": [
+          "Kreisveterinäramt Reutlingen, Aulbergstraße 32, 72764 Reutlingen",
+          "https://www.kreis-reutlingen.de"
+        ]
       },
       {
-        h: 'Urheberrecht',
-        p: [
-          'Die durch die Anbieterin erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Eine Vervielfältigung oder Verwendung außerhalb der Grenzen des Urheberrechts bedarf der schriftlichen Zustimmung.',
-        ],
+        "h": "Erlaubnis",
+        "p": [
+          "Die Erlaubnis gemäß § 11 Abs. 1 Satz 1 Nr. 8f TierSchG wurde mir durch das Kreisveterinäramt Reutlingen erteilt."
+        ]
       },
-    ],
+      {
+        "h": "Berufsbezeichnung und berufsrechtliche Regelungen",
+        "p": [
+          "Berufsbezeichnung: Hundetrainerin ATN AG",
+          "Verliehen durch: Kreisveterinäramt Reutlingen, Aulbergstraße 32, 72764 Reutlingen",
+          "Es gelten folgende berufsrechtliche Regelungen: § 11 Abs. 1 Satz 1 Nr. 8f TierSchG, einsehbar unter https://www.gesetze-im-internet.de/tierschg/__11.html"
+        ]
+      },
+      {
+        "h": "Mitgliedschaft",
+        "p": [
+          "Mitglied im Internationalen Berufsverband der Hundetrainer & Hundeunternehmer (IBH) e.V."
+        ]
+      },
+      {
+        "h": "Streitschlichtung",
+        "p": [
+          "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+        ]
+      },
+      {
+        "h": "Haftung für Inhalte",
+        "p": [
+          "Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.",
+          "Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen."
+        ]
+      },
+      {
+        "h": "Haftung für Links",
+        "p": [
+          "Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar.",
+          "Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen."
+        ]
+      },
+      {
+        "h": "Urheberrecht",
+        "p": [
+          "Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.",
+          "Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen."
+        ]
+      }
+    ]
   },
-  datenschutz: {
-    title: 'Datenschutz',
-    lead: 'Informationen zur Verarbeitung personenbezogener Daten',
-    blocks: [
+  "datenschutz": {
+    "title": "Datenschutzerklärung",
+    "lead": "Informationen zur Verarbeitung personenbezogener Daten auf dieser Website",
+    "blocks": [
       {
-        h: 'Verantwortliche',
-        p: ['{{name}}, {{strasse}}, {{plzOrt}}, {{email}}'],
+        "h": "1. Datenschutz auf einen Blick",
+        "p": [
+          "Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.",
+          "Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen – etwa Angaben, die Sie in das Kontaktformular eingeben. Andere Daten werden beim Besuch der Website automatisch durch technische Systeme erfasst, vor allem technische Daten wie Browsertyp, Betriebssystem oder Uhrzeit des Seitenaufrufs.",
+          "Diese Website setzt keine Analyse- oder Werbe-Werkzeuge ein. Ihr Surfverhalten wird nicht ausgewertet, es findet kein Tracking statt und es werden keine Daten an Dritte zu Werbezwecken weitergegeben."
+        ]
       },
       {
-        h: 'Grundsatz',
-        p: [
-          'Personenbezogene Daten werden nur erhoben, wenn dies für die Erbringung des Trainingsangebots erforderlich ist oder eine Einwilligung vorliegt. Eine Weitergabe an Dritte erfolgt nicht ohne ausdrückliche Zustimmung.',
-        ],
+        "h": "2. Hosting: Cloudflare",
+        "p": [
+          "Diese Website wird bei Cloudflare gehostet. Anbieter ist die Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA, bzw. die Cloudflare Germany GmbH, Rosental 7, 80331 München.",
+          "Cloudflare bietet ein weltweit verteiltes Netzwerk, über das die Inhalte dieser Website ausgeliefert werden. Dabei verarbeitet Cloudflare technisch notwendige Verbindungsdaten, um die Auslieferung sicher und stabil zu ermöglichen und Angriffe abzuwehren. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; wir haben ein berechtigtes Interesse an einer möglichst zuverlässigen und sicheren Darstellung unserer Website.",
+          "Eine Übermittlung von Daten in die USA kann dabei nicht ausgeschlossen werden. Sie wird auf die Standardvertragsklauseln der EU-Kommission gestützt. Details: https://www.cloudflare.com/privacypolicy/",
+          "Die im Kontaktformular übermittelten Angaben sowie die pflegbaren Inhalte der Website werden im Speicherdienst Cloudflare Workers KV abgelegt. Formularanfragen werden dort nach 180 Tagen automatisch gelöscht."
+        ]
       },
       {
-        h: 'Kontaktaufnahme',
-        p: [
-          'Bei einer Anfrage über das Kontaktformular, per E-Mail oder telefonisch werden die übermittelten Angaben zur Bearbeitung der Anfrage und für mögliche Anschlussfragen gespeichert (Art. 6 Abs. 1 lit. b bzw. f DSGVO). Die Daten werden gelöscht, sobald sie nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungsfristen entgegenstehen.',
-          'Die Anfrage wird zur Zustellung an den E-Mail-Versanddienst Resend (Resend, Inc., USA) übergeben und zusätzlich für bis zu 180 Tage verschlüsselt im Speicher des Hosting-Anbieters abgelegt, damit keine Anfrage verloren geht. Grundlage sind Standardvertragsklauseln nach Art. 46 DSGVO.',
-        ],
+        "h": "3. Hinweis zur verantwortlichen Stelle",
+        "p": [
+          "Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:",
+          "{{betrieb}}, {{name}}, {{strasse}}, {{plzOrt}}",
+          "Telefon: {{festnetz}} · E-Mail: {{email}}",
+          "Verantwortliche Stelle ist die natürliche oder juristische Person, die allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten entscheidet."
+        ]
       },
       {
-        h: 'Kursanmeldungen',
-        p: [
-          'Für die Durchführung eines Kurses oder Einzeltrainings werden Name, Anschrift, Kontaktdaten sowie Angaben zum Hund verarbeitet. Rechtsgrundlage ist die Vertragserfüllung nach Art. 6 Abs. 1 lit. b DSGVO.',
-        ],
+        "h": "Speicherdauer",
+        "p": [
+          "Soweit innerhalb dieser Datenschutzerklärung keine speziellere Speicherdauer genannt wurde, verbleiben Ihre personenbezogenen Daten bei uns, bis der Zweck für die Datenverarbeitung entfällt. Wenn Sie ein berechtigtes Löschersuchen geltend machen oder eine Einwilligung zur Datenverarbeitung widerrufen, werden Ihre Daten gelöscht, sofern wir keine anderen rechtlich zulässigen Gründe für die Speicherung haben – etwa steuer- oder handelsrechtliche Aufbewahrungsfristen."
+        ]
       },
       {
-        h: 'Cookies',
-        p: [
-          'Diese Website setzt nur technisch notwendige Cookies bzw. lokale Speichereinträge ein – etwa um deine Cookie-Entscheidung zu merken und um das Kontaktformular gegen Missbrauch zu schützen. Optionale Cookies für Statistik werden erst nach deiner ausdrücklichen Einwilligung gesetzt; diese kannst du über den Link „Cookie-Einstellungen“ im Fußbereich jederzeit ändern oder widerrufen.',
-        ],
+        "h": "Rechtsgrundlagen der Verarbeitung",
+        "p": [
+          "Sofern Sie in die Datenverarbeitung eingewilligt haben, verarbeiten wir Ihre personenbezogenen Daten auf Grundlage von Art. 6 Abs. 1 lit. a DSGVO. Sofern Sie in die Speicherung von Cookies oder in den Zugriff auf Informationen in Ihrem Endgerät eingewilligt haben, erfolgt die Verarbeitung zusätzlich auf Grundlage von § 25 Abs. 1 TDDDG. Die Einwilligung ist jederzeit widerrufbar.",
+          "Sind Ihre Daten zur Vertragserfüllung oder zur Durchführung vorvertraglicher Maßnahmen erforderlich, verarbeiten wir sie auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO. Weiter verarbeiten wir Ihre Daten, sofern dies zur Erfüllung einer rechtlichen Verpflichtung erforderlich ist, auf Grundlage von Art. 6 Abs. 1 lit. c DSGVO, sowie auf Grundlage unseres berechtigten Interesses nach Art. 6 Abs. 1 lit. f DSGVO."
+        ]
       },
       {
-        h: 'Schriftarten und externe Inhalte',
-        p: [
-          'Alle Schriftarten werden vom eigenen Server ausgeliefert. Es findet keine Verbindung zu Google Fonts oder vergleichbaren Diensten statt. Beim Aufruf der Seite werden keine Daten an Dritte übertragen.',
-        ],
+        "h": "Hinweis zur Datenweitergabe in die USA",
+        "p": [
+          "Für den Betrieb dieser Website setzen wir Dienste von Unternehmen mit Sitz in den USA ein (Cloudflare für das Hosting, Resend für den Versand von E-Mails). Dabei können personenbezogene Daten in die USA übertragen und dort verarbeitet werden. Wir weisen darauf hin, dass dort kein mit der EU vergleichbares Datenschutzniveau garantiert werden kann. Die Übermittlung wird auf die Standardvertragsklauseln der EU-Kommission nach Art. 46 DSGVO gestützt."
+        ]
       },
       {
-        h: 'SSL-Verschlüsselung',
-        p: [
-          'Diese Seite nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte eine SSL-Verschlüsselung. Daten, die du übermittelst, können somit nicht von Dritten mitgelesen werden.',
-        ],
+        "h": "Widerruf Ihrer Einwilligung zur Datenverarbeitung",
+        "p": [
+          "Viele Datenverarbeitungsvorgänge sind nur mit Ihrer ausdrücklichen Einwilligung möglich. Sie können eine bereits erteilte Einwilligung jederzeit widerrufen. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Datenverarbeitung bleibt vom Widerruf unberührt."
+        ]
       },
       {
-        h: 'Hosting und Server-Logfiles',
-        p: [
-          'Die Website wird bei Cloudflare (Cloudflare, Inc.) gehostet. Beim Aufruf der Website werden automatisch Zugriffsdaten (IP-Adresse, Datum und Uhrzeit, aufgerufene Seite, Browsertyp) verarbeitet. Die Verarbeitung erfolgt zum sicheren und stabilen Betrieb der Website auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO.',
-        ],
+        "h": "Widerspruchsrecht (Art. 21 DSGVO)",
+        "p": [
+          "Wenn die Datenverarbeitung auf Grundlage von Art. 6 Abs. 1 lit. e oder f DSGVO erfolgt, haben Sie jederzeit das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, gegen die Verarbeitung Ihrer personenbezogenen Daten Widerspruch einzulegen; dies gilt auch für ein auf diese Bestimmungen gestütztes Profiling. Wenn Sie Widerspruch einlegen, werden wir Ihre betroffenen personenbezogenen Daten nicht mehr verarbeiten, es sei denn, wir können zwingende schutzwürdige Gründe für die Verarbeitung nachweisen, die Ihre Interessen, Rechte und Freiheiten überwiegen, oder die Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen.",
+          "Werden Ihre personenbezogenen Daten verarbeitet, um Direktwerbung zu betreiben, haben Sie das Recht, jederzeit Widerspruch gegen die Verarbeitung einzulegen. Nach einem Widerspruch werden Ihre Daten nicht mehr zum Zwecke der Direktwerbung verwendet."
+        ]
       },
       {
-        h: 'Fotos aus dem Training',
-        p: [
-          'Aufnahmen aus Kursen und Einzeltrainings werden nur mit vorheriger Einwilligung veröffentlicht. Eine erteilte Einwilligung kann jederzeit widerrufen werden.',
-        ],
+        "h": "Beschwerderecht bei der zuständigen Aufsichtsbehörde",
+        "p": [
+          "Im Falle von Verstößen gegen die DSGVO steht den Betroffenen ein Beschwerderecht bei einer Aufsichtsbehörde zu, insbesondere in dem Mitgliedstaat ihres gewöhnlichen Aufenthalts, ihres Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes. Zuständig ist für uns der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg."
+        ]
       },
       {
-        h: 'Deine Rechte',
-        p: [
-          'Es besteht jederzeit das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch sowie das Recht auf Beschwerde bei einer Aufsichtsbehörde.',
-        ],
+        "h": "Recht auf Datenübertragbarkeit",
+        "p": [
+          "Sie haben das Recht, Daten, die wir auf Grundlage Ihrer Einwilligung oder in Erfüllung eines Vertrags automatisiert verarbeiten, an sich oder an einen Dritten in einem gängigen, maschinenlesbaren Format aushändigen zu lassen. Sofern Sie die direkte Übertragung der Daten an einen anderen Verantwortlichen verlangen, erfolgt dies nur, soweit es technisch machbar ist."
+        ]
       },
-    ],
+      {
+        "h": "Auskunft, Löschung und Berichtigung",
+        "p": [
+          "Sie haben im Rahmen der geltenden gesetzlichen Bestimmungen jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger und den Zweck der Datenverarbeitung und gegebenenfalls ein Recht auf Berichtigung oder Löschung dieser Daten. Hierzu sowie zu weiteren Fragen zum Thema personenbezogene Daten können Sie sich jederzeit an uns wenden."
+        ]
+      },
+      {
+        "h": "Recht auf Einschränkung der Verarbeitung",
+        "p": [
+          "Sie haben das Recht, die Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen. Das Recht besteht insbesondere, wenn Sie die Richtigkeit Ihrer bei uns gespeicherten Daten bestreiten, wenn die Verarbeitung unrechtmäßig geschah oder geschieht, wenn wir Ihre Daten nicht mehr benötigen, Sie sie jedoch zur Ausübung oder Verteidigung von Rechtsansprüchen brauchen, oder wenn Sie Widerspruch nach Art. 21 Abs. 1 DSGVO eingelegt haben und die Abwägung noch nicht abgeschlossen ist.",
+          "Wenn Sie die Verarbeitung eingeschränkt haben, dürfen diese Daten – von ihrer Speicherung abgesehen – nur mit Ihrer Einwilligung oder zur Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen oder zum Schutz der Rechte einer anderen Person oder aus Gründen eines wichtigen öffentlichen Interesses verarbeitet werden."
+        ]
+      },
+      {
+        "h": "SSL- bzw. TLS-Verschlüsselung",
+        "p": [
+          "Diese Seite nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte, wie zum Beispiel Anfragen, die Sie an uns senden, eine SSL- bzw. TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers „https://“ anzeigt und am Schloss-Symbol in Ihrer Browserzeile. Wenn die Verschlüsselung aktiviert ist, können die Daten, die Sie an uns übermitteln, nicht von Dritten mitgelesen werden."
+        ]
+      },
+      {
+        "h": "Widerspruch gegen Werbe-E-Mails",
+        "p": [
+          "Der Nutzung von im Rahmen der Impressumspflicht veröffentlichten Kontaktdaten zur Übersendung von nicht ausdrücklich angeforderter Werbung und Informationsmaterialien wird hiermit widersprochen. Die Betreiber der Seiten behalten sich ausdrücklich rechtliche Schritte im Falle der unverlangten Zusendung von Werbeinformationen vor."
+        ]
+      },
+      {
+        "h": "4. Cookies und lokale Speicherung",
+        "p": [
+          "Diese Website setzt nur technisch notwendige Einträge im Speicher Ihres Browsers. Konkret merken wir uns Ihre Entscheidung aus dem Cookie-Hinweis, damit dieser nicht bei jedem Besuch erneut erscheint. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO in Verbindung mit § 25 Abs. 2 TDDDG; es handelt sich um für den Betrieb erforderliche Speicherung.",
+          "Optionale Cookies für Statistik oder Werbung setzen wir nicht. Sollten wir künftig solche einsetzen, geschieht dies erst nach Ihrer ausdrücklichen Einwilligung, die Sie über den Link „Cookie-Einstellungen“ im Fußbereich jederzeit ändern oder widerrufen können.",
+          "Für die Anmeldung im nicht öffentlichen Verwaltungsbereich der Website wird ein technisch notwendiges Sitzungs-Cookie gesetzt. Es betrifft ausschließlich die Betreiberin und keine Besucherinnen und Besucher."
+        ]
+      },
+      {
+        "h": "Server-Log-Dateien",
+        "p": [
+          "Beim Aufruf dieser Website werden durch den Hosting-Anbieter automatisch Zugriffsdaten verarbeitet: Browsertyp und Browserversion, verwendetes Betriebssystem, Referrer-URL, Uhrzeit der Serveranfrage und IP-Adresse. Eine Zusammenführung dieser Daten mit anderen Datenquellen wird nicht vorgenommen. Die Erfassung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO; wir haben ein berechtigtes Interesse an der technisch fehlerfreien Darstellung und der Sicherheit unserer Website."
+        ]
+      },
+      {
+        "h": "Kontaktformular",
+        "p": [
+          "Wenn Sie uns per Kontaktformular Anfragen zukommen lassen, werden Ihre Angaben aus dem Anfrageformular inklusive der von Ihnen dort angegebenen Kontaktdaten zwecks Bearbeitung der Anfrage und für den Fall von Anschlussfragen bei uns gespeichert. Diese Daten geben wir nicht ohne Ihre Einwilligung weiter.",
+          "Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO, sofern Ihre Anfrage mit der Erfüllung eines Vertrags zusammenhängt oder zur Durchführung vorvertraglicher Maßnahmen erforderlich ist. In allen übrigen Fällen beruht die Verarbeitung auf unserem berechtigten Interesse an der effektiven Bearbeitung der an uns gerichteten Anfragen (Art. 6 Abs. 1 lit. f DSGVO) oder auf Ihrer Einwilligung (Art. 6 Abs. 1 lit. a DSGVO).",
+          "Zur Abwehr von Missbrauch speichern wir zu jeder Formularanfrage zusätzlich Zeitpunkt, IP-Adresse und Browserkennung. Die Anfrage wird für bis zu 180 Tage im Speicher des Hosting-Anbieters vorgehalten und danach automatisch gelöscht – früher, wenn Sie uns zur Löschung auffordern oder der Zweck entfällt. Zwingende gesetzliche Aufbewahrungsfristen bleiben unberührt."
+        ]
+      },
+      {
+        "h": "Anfrage per E-Mail oder Telefon",
+        "p": [
+          "Wenn Sie uns per E-Mail oder Telefon kontaktieren, wird Ihre Anfrage inklusive aller daraus hervorgehenden personenbezogenen Daten zum Zwecke der Bearbeitung Ihres Anliegens bei uns gespeichert und verarbeitet. Diese Daten geben wir nicht ohne Ihre Einwilligung weiter. Die Rechtsgrundlagen entsprechen denen des Kontaktformulars."
+        ]
+      },
+      {
+        "h": "5. Versand von E-Mails: Resend",
+        "p": [
+          "Für die Zustellung der Nachrichten aus dem Kontaktformular sowie der automatischen Eingangsbestätigung nutzen wir den Dienst Resend. Anbieter ist die Resend, Inc., 2261 Market Street #5039, San Francisco, CA 94114, USA.",
+          "An Resend werden dabei die von Ihnen im Formular angegebenen Daten übermittelt, soweit sie Bestandteil der Nachricht sind – also Name, Kontaktangabe, Thema und Ihre Nachricht. Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b bzw. f DSGVO zur Bearbeitung Ihrer Anfrage. Die Übermittlung in die USA wird auf die Standardvertragsklauseln der EU-Kommission gestützt.",
+          "Weitere Informationen: https://resend.com/legal/privacy-policy"
+        ]
+      },
+      {
+        "h": "6. Schriftarten",
+        "p": [
+          "Diese Seite nutzt zur einheitlichen Darstellung die Schriftarten „Bricolage Grotesque“ und „Instrument Sans“. Beide sind lokal auf unserem Server installiert und werden von dort ausgeliefert. Eine Verbindung zu Servern von Google oder anderen Anbietern findet dabei nicht statt."
+        ]
+      },
+      {
+        "h": "7. Keine Analyse-Werkzeuge, keine eingebetteten Karten",
+        "p": [
+          "Diese Website verwendet weder Google Analytics noch vergleichbare Analysedienste, kein Facebook-Pixel und keine sonstigen Werkzeuge zur Reichweitenmessung oder Werbung. Es sind auch keine Karten-, Video- oder Social-Media-Dienste eingebettet, die beim Seitenaufruf Daten an Dritte übertragen würden. Links zu sozialen Netzwerken sind einfache Verweise und stellen erst beim Anklicken eine Verbindung her."
+        ]
+      },
+      {
+        "h": "Fotos aus dem Training",
+        "p": [
+          "Aufnahmen aus Kursen und Einzeltrainings werden nur mit vorheriger Einwilligung der abgebildeten Personen veröffentlicht. Eine erteilte Einwilligung kann jederzeit mit Wirkung für die Zukunft widerrufen werden."
+        ]
+      }
+    ]
   },
-  agb: {
-    title: 'AGB',
-    lead: 'Allgemeine Geschäftsbedingungen für Kurse und Einzeltrainings',
-    blocks: [
+  "agb": {
+    "title": "AGB",
+    "lead": "Allgemeine Geschäftsbedingungen von {{betrieb}}",
+    "blocks": [
       {
-        h: '1. Geltungsbereich',
-        p: [
-          'Diese Bedingungen gelten für alle Gruppenkurse, Einzeltrainings und mobilen Trainings von {{betrieb}}.',
-        ],
+        "h": "1. Teilnahme auf eigene Gefahr",
+        "p": [
+          "Die Teilnahme am Angebot von {{betrieb}} erfolgt auf eigene Gefahr. {{betrieb}} haftet nicht für Schäden, die durch den Umgang mit den Hunden oder durch diese entstehen. Auf jeglichen Haftungsanspruch gegen {{betrieb}} und die Trainer bzw. Referenten wird bei der Teilnahme am Programm verzichtet."
+        ]
       },
       {
-        h: '2. Anmeldung und Vertrag',
-        p: [
-          'Die Anmeldung erfolgt schriftlich, per E-Mail oder über das Kontaktformular. Der Vertrag kommt mit der Anmeldebestätigung zustande. Kursplätze werden in der Reihenfolge der Anmeldungen vergeben.',
-        ],
+        "h": "2. Impfschutz und Versicherung",
+        "p": [
+          "Teilnehmende Hunde müssen über einen gültigen Impfschutz (Staupe, Hepatitis, Leptospirose und Tollwut) verfügen und es muss eine gültige Hundehaftpflichtversicherung für den teilnehmenden Hund abgeschlossen sein. Auf Verlangen sind die nötigen Unterlagen vorzulegen. Die Teilnahme an den Seminaren mit Hund kann nur mit vorheriger Absprache stattfinden."
+        ]
       },
       {
-        h: '3. Kursgebühren',
-        p: [
-          'Die Gebühren ergeben sich aus der jeweiligen Kursausschreibung bzw. der Preisliste und sind vor Kursbeginn fällig. Alle Preise verstehen sich inklusive Mehrwertsteuer.',
-        ],
+        "h": "3. Kurs- und Seminargebühr",
+        "p": [
+          "Die Kurs- und Seminargebühr wird mit der Bestätigung der Anmeldung fällig. Du kannst den Betrag entweder in bar begleichen oder auf folgendes Konto überweisen:",
+          "Volksbank Plochingen e.G. · IBAN: DE66 6119 1310 0857 4260 01 · BIC: GENODES1VBP",
+          "Da die Teilnehmerzahl beim Angebot von {{betrieb}} beschränkt ist, entscheidet der Eingang der Kurs- bzw. Seminargebühr über die Teilnahme. Der Rechnungsbetrag des Einzeltrainings wird nach Erhalt der Rechnung fällig."
+        ]
       },
       {
-        h: '4. Rücktritt und Ausfall',
-        p: [
-          'Bei einem Rücktritt bis 14 Tage vor Kursbeginn wird die Gebühr vollständig zurückerstattet. Danach wird die Gebühr fällig, sofern der Platz nicht anderweitig besetzt werden kann. Versäumte Einheiten können nicht erstattet werden. Muss ein Termin von meiner Seite ausfallen, wird er nachgeholt.',
-        ],
+        "h": "4. Stornierung",
+        "p": [
+          "Nicht in Anspruch genommene Seminare und Kurse werden nicht erstattet. Bei Stornierung eines Seminars sind folgende Stornogebühren zu entrichten:",
+          "Stornierung bis zu 30 Tagen vor Veranstaltungsbeginn: Es wird die gesamte Teilnahmegebühr fällig.",
+          "Stornierung bis zu 45 Tagen vor Veranstaltungsbeginn: Es werden 50 % der Teilnahmegebühr fällig.",
+          "Stornierung bis zu 60 Tagen vor Veranstaltungsbeginn: Wir zahlen die bereits gezahlten Teilnahmegebühren in voller Höhe abzüglich einer Bearbeitungsgebühr von 15,00 € zurück.",
+          "Selbstverständlich besteht die Möglichkeit, ohne weitere Zusatzgebühren einen Ersatzteilnehmer für die gebuchte Veranstaltung anzumelden."
+        ]
       },
       {
-        h: '5. Teilnahmevoraussetzungen',
-        p: [
-          'Teilnehmende Hunde müssen frei von ansteckenden Krankheiten und ausreichend geimpft sein. Läufige Hündinnen bitte vorab melden. Für jeden Hund ist eine gültige Hundehalter-Haftpflichtversicherung erforderlich. Teilnehmende unter 18 Jahren benötigen die Zustimmung der Erziehungsberechtigten.',
-        ],
+        "h": "5. Rücktritt und Ausfall",
+        "p": [
+          "{{betrieb}} hält sich das Recht vor, ohne Einhaltung einer Frist vom Vertrag zurückzutreten, wenn der Teilnehmer sich vertragswidrig verhält.",
+          "Sollte eine Veranstaltung aufgrund zu geringer Teilnehmerzahl, Wetterverhältnissen, Krankheit oder anderen Gründen abgesagt werden müssen, wird zunächst – wenn möglich – ein Ersatztermin gestellt. Kann dieser vom Teilnehmer nicht wahrgenommen werden, wird die Veranstaltungsgebühr zurückerstattet. Weitere Unkosten des Teilnehmers, die im Zusammenhang mit der Seminarbuchung und -stornierung entstehen, sind vom Teilnehmer selbst zu tragen."
+        ]
       },
       {
-        h: '6. Haftung',
-        p: [
-          'Die Aufsichtspflicht über den Hund bleibt während des Trainings bei der jeweiligen Halterin oder dem Halter. Für Schäden, die durch den eigenen Hund verursacht werden, haftet die Halterin bzw. der Halter. Die Teilnahme erfolgt auf eigene Gefahr.',
-        ],
+        "h": "6. Versäumte Stunden",
+        "p": [
+          "Vom Teilnehmer nicht wahrgenommene Stunden eines Kurses oder einer Veranstaltung werden nicht erstattet."
+        ]
       },
       {
-        h: '7. Trainingsmethoden',
-        p: [
-          'Trainiert wird ausschließlich gewaltfrei und auf Basis positiver Verstärkung. Der Einsatz von Stachelhalsbändern, Würgehalsbändern oder ähnlichen Hilfsmitteln ist auf dem Trainingsgelände nicht erlaubt.',
-        ],
-      },
-      {
-        h: '8. Schlussbestimmungen',
-        p: [
-          'Sollte eine Bestimmung unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt. Es gilt deutsches Recht.',
-        ],
-      },
-    ],
-  },
+        "h": "7. Gerichtsstand",
+        "p": [
+          "Gerichtsstand ist der Sitz von {{betrieb}}."
+        ]
+      }
+    ]
+  }
 };
 
 export const DEFAULTS = {

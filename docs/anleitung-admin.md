@@ -49,12 +49,11 @@ Datenschutztext. Die Nummer muss also nur an einer Stelle gepflegt werden.
 * **Firmierung (Impressum)** – die vollständige Bezeichnung für das Impressum.
 * **Handynummer** – am besten im Format `+49 176 43198863`. Daraus wird automatisch ein
   Anruf-Link fürs Handy.
-* **E-Mail-Adresse** – ⚠️ Beim ersten Einrichten unbedingt von `kontakt@deine-domain.de` auf die
-  echte Adresse ändern.
+* **E-Mail-Adresse** – erscheint auch im Impressum und in der Datenschutzerklärung.
 * **Adresse für die Navigation** – die Adresse der Rietenlauhalle, die Besucher ins Navi eingeben.
 * **Instagram / Facebook** – die vollständige Adresse inklusive `https://`. Leer lassen blendet den
   Link aus.
-* **USt-IdNr.** – ⚠️ Beim ersten Einrichten von `DE000000000` auf den echten Wert ändern.
+* **USt-IdNr.** – erscheint im Impressum.
 
 ---
 

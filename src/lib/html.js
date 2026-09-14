@@ -58,6 +58,20 @@ export function paragraphs(text, className = '') {
   );
 }
 
+/**
+ * Maskiert den Text und macht enthaltene http(s)-Adressen anklickbar.
+ * Fuer Rechtstexte, in denen Behoerden- und Anbieterlinks im Fliesstext stehen.
+ */
+export function linkify(text) {
+  const sicher = esc(text);
+  return raw(
+    sicher.replace(
+      /https?:\/\/[^\s<>"']+[^\s<>"'.,;:)]/g,
+      (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+    )
+  );
+}
+
 /** Telefonnummer -> tel:-URL (Leerzeichen und Trennzeichen entfernen). */
 export function telHref(number) {
   return 'tel:' + String(number || '').replace(/[^\d+]/g, '');

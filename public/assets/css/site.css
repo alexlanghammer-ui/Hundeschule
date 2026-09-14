@@ -1286,3 +1286,8 @@ body.has-action-bar {
   font-weight: 600;
   letter-spacing: -0.02em;
 }
+
+/* Lange Adressen in Rechtstexten dürfen umbrechen statt die Seite zu dehnen. */
+.prose a {
+  overflow-wrap: anywhere;
+}

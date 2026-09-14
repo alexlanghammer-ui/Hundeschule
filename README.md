@@ -225,20 +225,28 @@ Neue Bilder nach demselben Muster benennen (`name-BREITE.webp`) und in `src/rend
 
 ---
 
-## 7. Rechtliches – vor dem Start prüfen
+## 7. Rechtliches
 
-Impressum, Datenschutz und AGB sind vollständig ausformuliert, enthalten aber zwei Platzhalter,
-die zwingend ersetzt werden müssen:
+Impressum, Datenschutzerklärung und AGB stammen inhaltlich von der bisherigen Website
+(alexandra-goller.4steps4dogs.de) und liegen in `src/data/defaults.js`. Kontaktdaten und
+USt-IdNr. werden über Platzhalter (`{{email}}`, `{{ustId}}` …) aus den im Admin-Bereich
+gepflegten Angaben eingesetzt.
 
-* **E-Mail-Adresse** `kontakt@deine-domain.de` → im Admin-Bereich unter „Kontakt“ eintragen.
-* **USt-IdNr.** `DE000000000` → im Admin-Bereich unter „Kontakt“ eintragen. Bei
-  Kleinunternehmerregelung nach § 19 UStG das Feld leeren und stattdessen die Steuernummer bzw.
-  einen entsprechenden Hinweis ergänzen.
+**Bewusst abweichend von der alten Fassung** – die alten Texte beschrieben eine andere Technik:
 
-Die Texte sind sorgfältig, aber ohne juristische Prüfung erstellt. Eine kurze Durchsicht durch eine
-Rechtsberatung ist vor dem Livegang empfehlenswert – insbesondere zu AGB und Haftung.
+* **Hosting**: Mittwald → Cloudflare.
+* **Google Analytics, Facebook-Pixel, Google Maps**: gestrichen. Diese Dienste sind hier nicht
+  eingebunden; sie in der Erklärung aufzuführen wäre schlicht falsch.
+* **Resend**: neu aufgenommen, weil Formularanfragen darüber zugestellt werden.
+* **Speicherung der Anfragen** im KV für 180 Tage: neu aufgenommen.
+* **§ 5 TMG → § 5 DDG**, ebenso §§ 7–10 TMG → DDG: Das TMG wurde im Mai 2024 durch das
+  Digitale-Dienste-Gesetz abgelöst. Ebenso TTDSG → TDDDG.
+* **Agenturhinweis** der alten Seite (new-page) entfernt – diese Website stammt nicht von dort.
+* **AGB-PDF-Link** auf die alte Domain entfernt, da er ins Leere zeigt, sobald die alte Seite
+  abgeschaltet wird.
 
----
+Die Texte sind sorgfältig übernommen und angepasst, aber nicht juristisch geprüft. Eine
+Durchsicht durch eine Rechtsberatung vor dem Livegang bleibt empfehlenswert.
 
 ## 8. Schriften
 

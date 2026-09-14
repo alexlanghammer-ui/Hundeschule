@@ -5,7 +5,7 @@
 
 import assert from 'node:assert/strict';
 import { sanitize, slugify, kursMeta, fillPlaceholders, DEFAULTS } from '../src/lib/content.js';
-import { esc, html, raw, toString, telHref } from '../src/lib/html.js';
+import { esc, html, linkify, raw, toString, telHref } from '../src/lib/html.js';
 import {
   anfrageMail,
   bestaetigungsMail,
@@ -52,6 +52,15 @@ test('raw() bleibt unveraendert', () => {
 
 test('Arrays werden zusammengefuegt, false/null verschwinden', () => {
   assert.equal(toString(html`${['a', 'b']}${false}${null}${undefined}`), 'ab');
+});
+
+test('linkify macht Adressen klickbar und maskiert den Rest', () => {
+  const aus = toString(linkify('Mehr unter https://example.de/x?a=1&b=2 nachlesen.'));
+  assert.ok(aus.includes('<a href="https://example.de/x?a=1&amp;b=2"'));
+  assert.ok(aus.includes('rel="noopener noreferrer"'));
+  assert.equal(toString(linkify('<b>kein Tag</b>')), '&lt;b&gt;kein Tag&lt;/b&gt;');
+  // Satzzeichen am Ende gehören nicht zur Adresse
+  assert.ok(toString(linkify('Siehe https://example.de.')).endsWith('</a>.'));
 });
 
 test('telHref entfernt Trennzeichen', () => {

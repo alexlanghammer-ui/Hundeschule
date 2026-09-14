@@ -3,7 +3,7 @@
  * Titel und Beschreibung fuer den <head>.
  */
 
-import { html, raw, telHref } from '../lib/html.js';
+import { html, linkify, raw, telHref } from '../lib/html.js';
 import { picture, PHOTOS, LEGAL_NAV } from './layout.js';
 import { fillPlaceholders, kursMeta, sichtbareKurse } from '../lib/content.js';
 
@@ -728,7 +728,7 @@ export function rechtSeite(content, key) {
                 (block) => html`<div>
                   <h2 style="font-size:clamp(19px,2vw,22px);font-weight:600">${block.h}</h2>
                   <div class="prose" style="margin-top:8px">
-                    ${block.p.map((line) => html`<p>${fillPlaceholders(line, k)}</p>`)}
+                    ${block.p.map((line) => html`<p>${linkify(fillPlaceholders(line, k))}</p>`)}
                   </div>
                 </div>`
               )}

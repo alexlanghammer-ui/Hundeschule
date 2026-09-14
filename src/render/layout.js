@@ -8,7 +8,7 @@ import { html, raw, esc, telHref } from '../lib/html.js';
  * Wird an Stylesheet und Skript angehängt. Bei jeder Änderung an site.css oder
  * site.js hochzählen – sonst liefern Browser tagelang die alte Datei aus.
  */
-export const ASSET_VERSION = '3';
+export const ASSET_VERSION = '4';
 
 export const NAV = [
   { href: '/', label: 'Start' },
