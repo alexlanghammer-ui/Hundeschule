@@ -522,3 +522,84 @@ body.admin .btn {
 .hilfe ol li {
   list-style: decimal;
 }
+
+/* Fotos */
+.bilder {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bild {
+  display: flex;
+  gap: 18px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  align-items: flex-start;
+}
+.bild__vorschau {
+  flex: none;
+  width: 190px;
+  height: 130px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--panel);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+.bild__vorschau img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bild__vorschau img[hidden] + .bild__leer {
+  display: block;
+}
+.bild__leer {
+  display: none;
+  font-size: 13px;
+  color: var(--soft);
+  text-align: center;
+  padding: 0 12px;
+}
+.bild__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.bild__label {
+  font-family: var(--font-head);
+  font-size: 18px;
+  display: block;
+}
+.bild__hinweis {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+  display: block;
+  margin-top: 3px;
+}
+.bild__tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  align-items: center;
+}
+.bild__tools .btn {
+  cursor: pointer;
+}
+.bild__tools [data-role='status'] {
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .bild {
+    flex-direction: column;
+  }
+  .bild__vorschau {
+    width: 100%;
+    height: 170px;
+  }
+}

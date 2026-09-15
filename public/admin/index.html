@@ -6,8 +6,8 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Verwaltung · Hundeschule</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/assets/css/site.css?v=4" />
-    <link rel="stylesheet" href="/assets/css/admin.css?v=4" />
+    <link rel="stylesheet" href="/assets/css/site.css?v=5" />
+    <link rel="stylesheet" href="/assets/css/admin.css?v=5" />
   </head>
   <body class="admin">
     <!-- ------------------------------------------------------------ Login -->
@@ -105,6 +105,7 @@
             <button type="button" class="admin-tab" data-tab="kontakt" aria-current="true">Kontakt</button>
             <button type="button" class="admin-tab" data-tab="preise">Preise</button>
             <button type="button" class="admin-tab" data-tab="kurse">Kurse &amp; Termine</button>
+            <button type="button" class="admin-tab" data-tab="bilder">Fotos</button>
             <button type="button" class="admin-tab" data-tab="anfragen">Anfragen</button>
             <button type="button" class="admin-tab" data-tab="system">System</button>
           </nav>
@@ -165,6 +166,21 @@
           <button class="btn btn--outline btn--sm" type="button" id="kursAdd">
             + Neuen Kurs anlegen
           </button>
+        </section>
+
+        <!-- Bilder -->
+        <section class="panel-section" data-panel="bilder" hidden>
+          <div class="section-head">
+            <h2>Fotos</h2>
+            <p>
+              Jedes Bild wird beim Hochladen automatisch verkleinert – du kannst also direkt ein
+              Foto vom Handy oder aus der Kamera nehmen. Ohne eigenes Foto bleibt das
+              mitgelieferte Bild stehen.
+            </p>
+          </div>
+          <div id="bilderListe" class="bilder"></div>
+          <div class="alert alert--ok" id="bildOk" hidden></div>
+          <div class="alert alert--error" id="bildError" hidden></div>
         </section>
 
         <!-- Anfragen -->
@@ -272,6 +288,36 @@
         </section>
       </main>
     </div>
+
+    <template id="bildTpl">
+      <div class="bild">
+        <div class="bild__vorschau">
+          <img alt="" />
+          <span class="bild__leer">Noch kein eigenes Foto</span>
+        </div>
+        <div class="bild__text">
+          <strong class="bild__label"></strong>
+          <span class="bild__hinweis"></span>
+          <div class="field" style="margin-top: 10px">
+            <label>Bildbeschreibung (für Screenreader und Suchmaschinen)</label>
+            <input type="text" data-field="alt" placeholder="Alexandra Goller mit Hund Tayfun" />
+          </div>
+          <div class="bild__tools">
+            <label class="btn btn--dark btn--sm">
+              <span>Foto auswählen</span>
+              <input type="file" accept="image/*" hidden />
+            </label>
+            <button class="btn btn--outline btn--sm" type="button" data-act="alt">
+              Beschreibung speichern
+            </button>
+            <button class="btn btn--outline btn--sm" type="button" data-act="del">
+              Eigenes Foto entfernen
+            </button>
+          </div>
+          <p class="hint" data-role="status"></p>
+        </div>
+      </div>
+    </template>
 
     <template id="preisRowTpl">
       <div class="row">
@@ -386,6 +432,6 @@
       </details>
     </template>
 
-    <script src="/assets/js/admin.js?v=4" defer></script>
+    <script src="/assets/js/admin.js?v=5" defer></script>
   </body>
 </html>

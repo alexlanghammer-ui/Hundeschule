@@ -7,6 +7,7 @@
  */
 
 import DEFAULTS from '../data/defaults.js';
+import { ladeManifest } from './bilder.js';
 
 export const CONTENT_KEY = 'site:content';
 
@@ -109,6 +110,21 @@ export function sanitize(input) {
         .slice(0, LIMITS.kurse)
     : d.kurse;
 
+  const uIn = src.ueberMich && typeof src.ueberMich === 'object' ? src.ueberMich : {};
+  const ueberMich = {
+    titel: str(uIn.titel, LIMITS.short) || d.ueberMich.titel,
+    lead: Array.isArray(uIn.lead) ? strList(uIn.lead, LIMITS.text, 10) : d.ueberMich.lead,
+    abschnittTitel:
+      'abschnittTitel' in uIn ? str(uIn.abschnittTitel, LIMITS.short) : d.ueberMich.abschnittTitel,
+    absaetze: Array.isArray(uIn.absaetze)
+      ? strList(uIn.absaetze, LIMITS.text, 20)
+      : d.ueberMich.absaetze,
+    mitgliedschaft:
+      'mitgliedschaft' in uIn ? str(uIn.mitgliedschaft, LIMITS.line) : d.ueberMich.mitgliedschaft,
+    qualifikation:
+      'qualifikation' in uIn ? str(uIn.qualifikation, LIMITS.line) : d.ueberMich.qualifikation,
+  };
+
   const gelaendeIn = src.gelaende && typeof src.gelaende === 'object' ? src.gelaende : {};
   const gelaende = {
     text: Array.isArray(gelaendeIn.text)
@@ -140,20 +156,30 @@ export function sanitize(input) {
     };
   }
 
-  return { version: 1, kontakt, preise, kurse, gelaende, recht };
+  return { version: 1, kontakt, preise, kurse, ueberMich, gelaende, recht };
 }
 
 /** Aktuellen Inhalt laden (KV ueber Defaults gelegt). */
 export async function getContent(env) {
   const kv = env && env.SITE_KV;
-  if (!kv) return { ...DEFAULTS, _source: 'defaults' };
+  if (!kv) return { ...DEFAULTS, bilder: {}, _source: 'defaults' };
   try {
-    const stored = await kv.get(CONTENT_KEY, { type: 'json' });
-    if (!stored) return { ...DEFAULTS, _source: 'defaults' };
-    return { ...sanitize(stored), _source: 'kv', updatedAt: stored.updatedAt || null };
+    // Inhalt und Bilder-Verzeichnis liegen getrennt, damit ein Speichern im
+    // Admin-Bereich kein frisch hochgeladenes Foto überschreiben kann.
+    const [stored, bilder] = await Promise.all([
+      kv.get(CONTENT_KEY, { type: 'json' }),
+      ladeManifest(env),
+    ]);
+    if (!stored) return { ...DEFAULTS, bilder, _source: 'defaults' };
+    return {
+      ...sanitize(stored),
+      bilder,
+      _source: 'kv',
+      updatedAt: stored.updatedAt || null,
+    };
   } catch (err) {
     console.error('KV read failed, serving defaults:', err && err.message);
-    return { ...DEFAULTS, _source: 'defaults' };
+    return { ...DEFAULTS, bilder: {}, _source: 'defaults' };
   }
 }
 

@@ -133,6 +133,7 @@
     });
     if (ziel === 'anfragen') ladeAnfragen();
     if (ziel === 'system') ladeMail();
+    if (ziel === 'bilder') ladeBilder();
   });
 
   /* ------------------------------------------------------------ Änderungen */
@@ -483,6 +484,166 @@
   }
 
   el('anfragenReload').addEventListener('click', ladeAnfragen);
+
+  /* ------------------------------------------------------------------ Fotos */
+  var MAX_BREITE = 1600;
+  var MAX_HOEHE = 1600;
+
+  /**
+   * Verkleinert ein Foto im Browser auf eine web-taugliche Größe.
+   * Ein Handyfoto hat schnell 4 MB – ungekürzt hochgeladen würde es die Seite
+   * für Besucher spürbar langsamer machen. JPEG, weil das jeder Browser anzeigt.
+   */
+  function verkleinern(datei) {
+    return new Promise(function (fertig, fehlgeschlagen) {
+      var leser = new FileReader();
+      leser.onerror = function () { fehlgeschlagen(new Error('Die Datei ließ sich nicht lesen.')); };
+      leser.onload = function () {
+        var img = new Image();
+        img.onerror = function () { fehlgeschlagen(new Error('Das ist kein lesbares Bild.')); };
+        img.onload = function () {
+          var faktor = Math.min(1, MAX_BREITE / img.width, MAX_HOEHE / img.height);
+          var breite = Math.round(img.width * faktor);
+          var hoehe = Math.round(img.height * faktor);
+          var leinwand = document.createElement('canvas');
+          leinwand.width = breite;
+          leinwand.height = hoehe;
+          var ctx = leinwand.getContext('2d');
+          ctx.drawImage(img, 0, 0, breite, hoehe);
+          try {
+            fertig({
+              datenUrl: leinwand.toDataURL('image/jpeg', 0.85),
+              breite: breite,
+              hoehe: hoehe,
+            });
+          } catch (e) {
+            fehlgeschlagen(new Error('Das Bild ließ sich nicht umwandeln.'));
+          }
+        };
+        img.src = leser.result;
+      };
+      leser.readAsDataURL(datei);
+    });
+  }
+
+  function bildMeldung(art, text) {
+    setzeSichtbar('bildOk', art === 'ok');
+    setzeSichtbar('bildError', art === 'fehler');
+    if (art === 'ok') el('bildOk').textContent = text;
+    if (art === 'fehler') el('bildError').textContent = text;
+  }
+
+  function ladeBilder() {
+    var ziel = el('bilderListe');
+    ziel.innerHTML = '<p class="hint">Wird geladen…</p>';
+    api('/api/admin/bilder')
+      .then(function (data) {
+        ziel.innerHTML = '';
+        data.slots.forEach(function (slot) {
+          var knoten = el('bildTpl').content.cloneNode(true);
+          var box = knoten.querySelector('.bild');
+          var vorschau = box.querySelector('.bild__vorschau img');
+          var status = box.querySelector('[data-role="status"]');
+          var altFeld = box.querySelector('[data-field="alt"]');
+
+          box.querySelector('.bild__label').textContent = slot.label;
+          box.querySelector('.bild__hinweis').textContent = slot.hinweis;
+
+          function zeigeStand(eigenes) {
+            if (eigenes && eigenes.hash) {
+              vorschau.src = '/bilder/' + slot.id + '?v=' + eigenes.hash;
+              vorschau.hidden = false;
+              altFeld.value = eigenes.alt || '';
+              status.textContent = 'Eigenes Foto aktiv.';
+              box.querySelector('[data-act="del"]').disabled = false;
+            } else {
+              vorschau.hidden = true;
+              vorschau.removeAttribute('src');
+              status.textContent = 'Es wird das mitgelieferte Bild angezeigt.';
+              box.querySelector('[data-act="del"]').disabled = true;
+            }
+          }
+          zeigeStand(slot.eigenes);
+
+          box.querySelector('input[type="file"]').addEventListener('change', function (e) {
+            var datei = e.target.files && e.target.files[0];
+            if (!datei) return;
+            bildMeldung('', '');
+            status.textContent = 'Wird verkleinert…';
+            verkleinern(datei)
+              .then(function (ergebnis) {
+                status.textContent = 'Wird hochgeladen…';
+                return api('/api/admin/bilder', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    slot: slot.id,
+                    datei: ergebnis.datenUrl,
+                    alt: altFeld.value,
+                  }),
+                }).then(function (antwort) {
+                  zeigeStand(antwort.eigenes);
+                  bildMeldung(
+                    'ok',
+                    'Foto gespeichert (' + ergebnis.breite + ' × ' + ergebnis.hoehe +
+                      ' Pixel). Auf der Website in etwa einer Minute sichtbar.'
+                  );
+                });
+              })
+              .catch(function (err) {
+                status.textContent = '';
+                bildMeldung('fehler', err.message);
+              })
+              .then(function () { e.target.value = ''; });
+          });
+
+          box.querySelector('[data-act="alt"]').addEventListener('click', function () {
+            if (vorschau.hidden) {
+              bildMeldung('fehler', 'Lade zuerst ein eigenes Foto hoch.');
+              return;
+            }
+            // Bild unverändert lassen, nur die Beschreibung neu schreiben:
+            // dafür laden wir das aktuelle Bild und schicken es zurück.
+            fetch(vorschau.src)
+              .then(function (r) { return r.blob(); })
+              .then(function (blob) {
+                return new Promise(function (fertig) {
+                  var leser = new FileReader();
+                  leser.onload = function () { fertig(leser.result); };
+                  leser.readAsDataURL(blob);
+                });
+              })
+              .then(function (datenUrl) {
+                return api('/api/admin/bilder', {
+                  method: 'POST',
+                  body: JSON.stringify({ slot: slot.id, datei: datenUrl, alt: altFeld.value }),
+                });
+              })
+              .then(function (antwort) {
+                zeigeStand(antwort.eigenes);
+                bildMeldung('ok', 'Beschreibung gespeichert.');
+              })
+              .catch(function (err) { bildMeldung('fehler', err.message); });
+          });
+
+          box.querySelector('[data-act="del"]').addEventListener('click', function () {
+            if (!confirm('Eigenes Foto entfernen? Danach erscheint wieder das mitgelieferte Bild.'))
+              return;
+            api('/api/admin/bilder?slot=' + encodeURIComponent(slot.id), { method: 'DELETE' })
+              .then(function () {
+                zeigeStand(null);
+                bildMeldung('ok', 'Eigenes Foto entfernt.');
+              })
+              .catch(function (err) { bildMeldung('fehler', err.message); });
+          });
+
+          ziel.appendChild(knoten);
+        });
+      })
+      .catch(function (err) {
+        ziel.innerHTML = '';
+        bildMeldung('fehler', 'Fotos konnten nicht geladen werden: ' + err.message);
+      });
+  }
 
   /* -------------------------------------------------------------- Mailversand */
   function mailMeldung(art, text) {

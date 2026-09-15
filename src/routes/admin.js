@@ -17,6 +17,7 @@ import {
 } from '../lib/auth.js';
 import { DEFAULTS, getContent, putContent } from '../lib/content.js';
 import { getMailConfig, saveMailConfig, sendMail } from '../lib/mail.js';
+import { ladeManifest, loescheBild, SLOTS, speichereBild } from '../lib/bilder.js';
 
 const PRAEFIX = 'anfrage:';
 
@@ -323,6 +324,57 @@ async function mailtest(request, env) {
   return jsonResponse({ ok: true, empfaenger });
 }
 
+/** Fotos hochladen, ansehen und entfernen. */
+async function bilder(request, env) {
+  const abgelehnt = await requireAdmin(request, env);
+  if (abgelehnt) return abgelehnt;
+
+  if (request.method === 'GET') {
+    const manifest = await ladeManifest(env);
+    return jsonResponse({
+      slots: SLOTS.map((slot) => ({
+        ...slot,
+        eigenes: manifest[slot.id] || null,
+      })),
+    });
+  }
+
+  if (!sameOrigin(request)) return jsonResponse({ error: 'Ungültige Anfrage.' }, { status: 403 });
+
+  if (request.method === 'DELETE') {
+    const slot = new URL(request.url).searchParams.get('slot') || '';
+    const fehler = await loescheBild(env, slot);
+    if (fehler) return jsonResponse({ error: fehler }, { status: 400 });
+    return jsonResponse({ ok: true });
+  }
+
+  let eingabe;
+  try {
+    eingabe = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Ungültige Daten.' }, { status: 400 });
+  }
+
+  // Das Bild kommt als Data-URL aus dem Browser, dort bereits verkleinert.
+  const treffer = /^data:(image\/[a-z+]+);base64,(.+)$/i.exec(String(eingabe.datei || ''));
+  if (!treffer) return jsonResponse({ error: 'Kein gültiges Bild empfangen.' }, { status: 400 });
+
+  let bytes;
+  try {
+    const binaer = atob(treffer[2]);
+    bytes = new Uint8Array(binaer.length);
+    for (let i = 0; i < binaer.length; i++) bytes[i] = binaer.charCodeAt(i);
+  } catch {
+    return jsonResponse({ error: 'Das Bild konnte nicht gelesen werden.' }, { status: 400 });
+  }
+
+  const fehler = await speichereBild(env, eingabe.slot, bytes, treffer[1], eingabe.alt);
+  if (fehler) return jsonResponse({ error: fehler }, { status: 400 });
+
+  const manifest = await ladeManifest(env);
+  return jsonResponse({ ok: true, eigenes: manifest[eingabe.slot] || null });
+}
+
 const ROUTEN = {
   login: { POST: login },
   einrichten: { POST: einrichten },
@@ -331,6 +383,7 @@ const ROUTEN = {
   session: { GET: session },
   content: { GET: content, PUT: content, DELETE: content },
   mail: { GET: mail, POST: mail },
+  bilder: { GET: bilder, POST: bilder, DELETE: bilder },
   mailtest: { POST: mailtest },
   anfragen: { GET: anfragen, DELETE: anfragen },
 };

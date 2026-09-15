@@ -128,6 +128,25 @@ export const KURSE = [
   },
 ];
 
+/** Inhalte der Seite „Ueber mich". */
+export const UEBER_MICH = {
+  "titel": "Herzlich willkommen",
+  "lead": [
+    "Meine Erfahrungen mit meinen eigenen Hunden sowie mit unterschiedlichsten Mensch-Hund-Teams zeigen mir immer wieder aufs Neue, dass erfolgreiches Training vor allem auf einem gegenseitigen vertrauensvollen Umgang und einem gemeinsamen positiven Lernen basiert.",
+    "Mit meinem Trainingsangebot für Mensch & Hund zeige ich Wege und Trainingsmöglichkeiten auf, die euch helfen, die Herausforderungen des Alltags gemeinsam zu meistern. Mein Ziel ist es, euch dabei zu unterstützen, die individuellen Bedürfnisse eures Hundes zu erkennen und das Verhalten besser zu verstehen, so dass das gegenseitige Vertrauen wachsen kann.",
+    "Ich begleite euch bei eurem gemeinsamen Weg mit viel Empathie und Kompetenz, so dass du und dein Hund zu einem vertrauten und unschlagbaren Team werdet."
+  ],
+  "abschnittTitel": "Die Leidenschaft, mit Mensch & Hund zu arbeiten",
+  "absaetze": [
+    "Die Freude an der Arbeit mit Mensch & Hund entdeckte ich schon in meiner Jugend. Mit unserem Familienhund nahm ich fleißig an allen Kursangeboten teil – von Welpen- über Junghundekurse bis hin zu den unterschiedlichsten Beschäftigungskursen. In dieser Zeit engagierte ich mich ehrenamtlich im Hundeverein und im Tierheim. Die gemeinsame Arbeit mit Mensch & Hund hat mir damals schon so viel Freude bereitet, dass meine Vision, als Hundetrainerin zu arbeiten, entstand.",
+    "Die Begeisterung an der Welpen- und Junghundeentwicklung habe ich der gemeinsamen Zeit mit meiner ersten Hündin Jessie zu verdanken. Jede Lebensphase brachte unvergessliche Momente und Herausforderungen mit sich, die wir zusammen erlebt und gemeistert haben und die uns zu einem unzertrennlichen Team gemacht haben. Mein jetziger Begleiter Tayfun zeigt mir dahingehend jeden Tag aufs Neue, dass auch im höheren Hunde-Alter ein vertrauensvolles Training miteinander bestens funktionieren kann und seine Früchte trägt.",
+    "Während meines BWL-Studiums und meiner Arbeit in der Wirtschaftsprüfung konnte ich meinen Jugendtraum nie ganz vergessen. Als dann 2018 Tayfun (Schäferhund-Mix) in mein Leben trat und mich vor viele Herausforderungen stellte – wie Leinenaggression, Trennungsstress oder Territorialverhalten – entschloss ich mich für die Ausbildung zur Hundetrainerin bei der ATN AG in Dürnten, Schweiz. Meine Ausbildung bestärkte mich in meinem Entschluss, in Zukunft Mensch-Hund-Teams auf ihrem gemeinsamen Weg zu begleiten und zu unterstützen.",
+    "Im Jahr 2020 schloss ich meine Ausbildung zur Hundetrainerin erfolgreich ab und bin seither im Team von 4steps4dogs in Waiblingen-Bittenfeld als Trainerin tätig. Seit 2021 betreibe ich meine eigene 4steps4dogs-Partnerschule."
+  ],
+  "mitgliedschaft": "Internationaler Berufsverband der Hundetrainer & Hundeunternehmer (IBH) e.V.",
+  "qualifikation": "Hundetrainerin ATN AG · Erlaubnis gemäß § 11 Abs. 1 Satz 1 Nr. 8f TierSchG"
+};
+
 export const GELAENDE = {
   text: [
     'Direkt neben der Rietenlauhalle in Hülben befindet sich mein Hundetrainingsgelände. Ich freue mich darauf, euch und euren Hunden unterschiedlichste Gruppenkurse sowie individuelle Einzeltrainings anzubieten.',
@@ -454,6 +473,7 @@ export const DEFAULTS = {
   kontakt: KONTAKT,
   preise: PREISE,
   kurse: KURSE,
+  ueberMich: UEBER_MICH,
   gelaende: GELAENDE,
   recht: RECHT,
 };

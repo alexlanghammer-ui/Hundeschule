@@ -9,6 +9,7 @@
 import { handleAdmin } from './routes/admin.js';
 import { handleKontakt } from './routes/kontakt.js';
 import { handleSeite } from './routes/site.js';
+import { ladeBild } from './lib/bilder.js';
 
 export default {
   async fetch(request, env) {
@@ -21,6 +22,20 @@ export default {
     }
 
     try {
+      // Selbst hochgeladene Fotos
+      if (path.startsWith('/bilder/')) {
+        const bild = await ladeBild(env, path.slice('/bilder/'.length));
+        if (!bild) return new Response('Nicht gefunden', { status: 404 });
+        return new Response(bild.body, {
+          headers: {
+            'Content-Type': bild.typ,
+            // Die Adresse enthält den Inhalts-Hash: Ändert sich das Bild,
+            // ändert sich die Adresse – daher unbedenklich lange speicherbar.
+            'Cache-Control': 'public, max-age=31536000, immutable',
+          },
+        });
+      }
+
       if (path.startsWith('/api/admin/')) return await handleAdmin(request, env, path);
       if (path === '/api/kontakt') return await handleKontakt(request, env);
       if (path.startsWith('/api/')) {

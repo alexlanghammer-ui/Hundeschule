@@ -8,7 +8,7 @@ import { html, raw, esc, telHref } from '../lib/html.js';
  * Wird an Stylesheet und Skript angehängt. Bei jeder Änderung an site.css oder
  * site.js hochzählen – sonst liefern Browser tagelang die alte Datei aus.
  */
-export const ASSET_VERSION = '4';
+export const ASSET_VERSION = '5';
 
 export const NAV = [
   { href: '/', label: 'Start' },
@@ -45,6 +45,35 @@ export function picture({ name, widths, jpegWidth, alt, className, sizes, loadin
     />
   </picture>`;
 }
+
+/**
+ * Bild fuer einen der Plaetze aus src/lib/bilder.js.
+ * Liegt dort ein selbst hochgeladenes Foto, gewinnt dieses; sonst wird das
+ * mitgelieferte in mehreren Breiten ausgeliefert.
+ */
+export function bild(content, slot, optionen = {}) {
+  const eigenes = (content.bilder || {})[slot];
+  if (eigenes && eigenes.hash) {
+    return html`<img
+      src="/bilder/${slot}?v=${eigenes.hash}"
+      alt="${eigenes.alt || optionen.alt || ''}"
+      class="${optionen.className || ''}"
+      loading="${optionen.loading || 'lazy'}"
+      decoding="async"
+      ${optionen.fetchpriority ? raw(`fetchpriority="${esc(optionen.fetchpriority)}"`) : ''}
+    />`;
+  }
+  const standard = PHOTOS[SLOT_STANDARD[slot]];
+  return picture({ ...standard, ...optionen });
+}
+
+/** Welches mitgelieferte Foto steht hinter welchem Platz. */
+export const SLOT_STANDARD = {
+  start: 'hero',
+  einzeltraining: 'puppy',
+  kurse: 'twoDogs',
+  uebermich: 'twoDogs',
+};
 
 export const PHOTOS = {
   hero: { name: 'hero-run', widths: [640, 920], jpegWidth: 920, alt: 'Schwarz-brauner Hund rennt über eine Wiese auf die Kamera zu' },

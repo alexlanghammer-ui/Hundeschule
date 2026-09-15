@@ -1291,3 +1291,9 @@ body.has-action-bar {
 .prose a {
   overflow-wrap: anywhere;
 }
+
+/* Hochformat-Portraits auf „Über mich“ etwas höher zeigen. */
+.side-photo--portrait {
+  height: clamp(280px, 42vw, 520px);
+  object-position: center 30%;
+}

@@ -106,6 +106,29 @@ ausgeblendet; erst wenn alles eingetragen ist, den Haken setzen und speichern.
 
 ---
 
+## Fotos
+
+Vier Bilder lassen sich austauschen: das große Bild auf der Startseite, das Foto bei
+„Einzeltraining“, das Foto bei „Kurse“ und das Foto bei „Über mich“.
+
+1. Bei dem gewünschten Platz auf **Foto auswählen** klicken und ein Bild vom Rechner oder Handy
+   aussuchen.
+2. Es wird **automatisch verkleinert** – du kannst also direkt ein Handyfoto nehmen, ohne vorher
+   etwas zuzuschneiden.
+3. Fertig. Auf der Website ist es innerhalb einer Minute zu sehen.
+
+**Bildbeschreibung**: Das Feld darüber beschreibt in einem Satz, was auf dem Foto zu sehen ist —
+zum Beispiel „Alexandra Goller mit ihrem Hund Tayfun auf dem Trainingsgelände“. Blinde Menschen
+bekommen diesen Satz vorgelesen, und Google versteht das Bild dadurch besser. Kurz und sachlich
+genügt.
+
+**Eigenes Foto entfernen** stellt das mitgelieferte Bild wieder her.
+
+Querformat passt am besten. Hochformat funktioniert auch, wird aber oben und unten beschnitten —
+schau nach dem Hochladen einmal auf der Seite nach, ob der Ausschnitt passt.
+
+---
+
 ## Anfragen
 
 Hier stehen alle Nachrichten aus dem Kontaktformular der letzten 180 Tage – neueste zuerst.

@@ -4,7 +4,7 @@
  */
 
 import { html, linkify, raw, telHref } from '../lib/html.js';
-import { picture, PHOTOS, LEGAL_NAV } from './layout.js';
+import { bild, LEGAL_NAV } from './layout.js';
 import { fillPlaceholders, kursMeta, sichtbareKurse } from '../lib/content.js';
 
 const SCHRITTE = [
@@ -75,8 +75,7 @@ export function startseite(content) {
     body: html`
       <div class="wrap" style="padding-top:clamp(20px,3vw,40px)">
         <section class="hero">
-          ${picture({
-            ...PHOTOS.hero,
+          ${bild(content, 'start', {
             className: 'hero__img',
             sizes: '100vw',
             loading: 'eager',
@@ -142,8 +141,7 @@ export function startseite(content) {
       <section class="wrap section--tight">
         <div class="grid grid--2">
           <a class="photo-card" href="/einzeltraining">
-            ${picture({
-              ...PHOTOS.puppy,
+            ${bild(content, 'einzeltraining', {
               className: 'photo-card__img',
               sizes: '(max-width: 760px) 100vw, 50vw',
             })}
@@ -157,8 +155,7 @@ export function startseite(content) {
             </div>
           </a>
           <a class="photo-card" href="/kurse">
-            ${picture({
-              ...PHOTOS.twoDogs,
+            ${bild(content, 'kurse', {
               className: 'photo-card__img',
               sizes: '(max-width: 760px) 100vw, 50vw',
             })}
@@ -225,8 +222,7 @@ export function einzeltraining(content) {
             </div>
           </div>
           <div class="stack gap-16">
-            ${picture({
-              ...PHOTOS.puppy,
+            ${bild(content, 'einzeltraining', {
               className: 'side-photo',
               sizes: '(max-width: 1080px) 100vw, 420px',
             })}
@@ -264,7 +260,7 @@ export function kurseUebersicht(content) {
       ${breadcrumb([{ href: '/', label: 'Start' }, { label: 'Kurse' }])}
       <section class="wrap section--tight">
         <div class="hero hero--compact">
-          ${picture({ ...PHOTOS.twoDogs, className: 'hero__img', sizes: '100vw' })}
+          ${bild(content, 'kurse', { className: 'hero__img', sizes: '100vw' })}
           <div class="hero__body">
             <h1>Gruppentraining – Freude am gemeinsamen Lernen</h1>
             <p>
@@ -464,6 +460,7 @@ export function gelaende(content) {
 /* -------------------------------------------------------------- Über mich */
 export function ueberMich(content) {
   const k = content.kontakt;
+  const u = content.ueberMich;
   return {
     title: 'Über mich',
     description:
@@ -473,40 +470,37 @@ export function ueberMich(content) {
       <section class="wrap section--tight">
         <div class="grid grid--split">
           <div class="stack gap-16">
-            <h1>Herzlich willkommen</h1>
-            <div class="prose measure">
-              <p>
-                Meine Erfahrungen mit meinen eigenen Hunden sowie mit unterschiedlichsten
-                Mensch-Hund-Teams zeigen mir immer wieder aufs Neue, dass erfolgreiches Training vor
-                allem auf einem gegenseitigen vertrauensvollen Umgang und einem gemeinsamen positiven
-                Lernen basiert.
-              </p>
-              <p>
-                Mit meinem Trainingsangebot für Mensch &amp; Hund zeige ich Wege und
-                Trainingsmöglichkeiten auf, die euch helfen, die Herausforderungen des Alltags
-                gemeinsam zu meistern. Mein Ziel ist es, euch dabei zu unterstützen, die individuellen
-                Bedürfnisse eures Hundes zu erkennen und das Verhalten besser zu verstehen, so dass
-                das gegenseitige Vertrauen wachsen kann.
-              </p>
-              <p>
-                Ich begleite euch bei eurem gemeinsamen Weg mit viel Empathie und Kompetenz, so dass
-                du und dein Hund zu einem vertrauten und unschlagbaren Team werdet.
-              </p>
-            </div>
-            <div class="panel stack gap-8">
-              <p class="eyebrow">Mitgliedschaft &amp; Qualifikation</p>
-              <p style="font-family:var(--font-head);font-size:19px;line-height:1.4">
-                Internationaler Berufsverband der Hundetrainer &amp; Hundeunternehmer (IBH) e.V.
-              </p>
-              <p style="color:var(--muted);font-size:16px">
-                Hundetrainerin ATN AG · Erlaubnis gemäß § 11 Abs. 1 Satz 1 Nr. 8f TierSchG
-              </p>
-            </div>
+            <h1>${u.titel}</h1>
+            <div class="prose measure">${u.lead.map((p) => html`<p>${p}</p>`)}</div>
+
+            ${u.absaetze.length
+              ? html`<div style="margin-top:8px">
+                  ${u.abschnittTitel
+                    ? html`<h2 style="font-size:clamp(22px,2.6vw,30px);margin-bottom:14px">
+                        ${u.abschnittTitel}
+                      </h2>`
+                    : ''}
+                  <div class="prose measure">${u.absaetze.map((p) => html`<p>${p}</p>`)}</div>
+                </div>`
+              : ''}
+
+            ${u.mitgliedschaft || u.qualifikation
+              ? html`<div class="panel stack gap-8">
+                  <p class="eyebrow">Mitgliedschaft &amp; Qualifikation</p>
+                  ${u.mitgliedschaft
+                    ? html`<p style="font-family:var(--font-head);font-size:19px;line-height:1.4">
+                        ${u.mitgliedschaft}
+                      </p>`
+                    : ''}
+                  ${u.qualifikation
+                    ? html`<p style="color:var(--muted);font-size:16px">${u.qualifikation}</p>`
+                    : ''}
+                </div>`
+              : ''}
           </div>
           <div class="stack gap-16">
-            ${picture({
-              ...PHOTOS.twoDogs,
-              className: 'side-photo',
+            ${bild(content, 'uebermich', {
+              className: 'side-photo side-photo--portrait',
               sizes: '(max-width: 1080px) 100vw, 420px',
             })}
             <div class="panel--dark stack gap-12">
